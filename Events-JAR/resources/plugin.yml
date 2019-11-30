@@ -1,0 +1,11 @@
+name: Events
+description: Plugin for moderating events
+version: 1.0 Alpha
+author: Rabbit_Hunter
+main: com.rabbit13.events.main.Main
+commands:
+  event:
+    description: "command for moderating events and creating eventplaces"
+    usage: "/events help"
+    aliases:
+      - e

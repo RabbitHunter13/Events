@@ -1,0 +1,10 @@
+test:
+  owner: "Rabbit_Hunter13"
+  teleport: "1574,70,-5845"
+  checkpoints:
+    - "101,50,-4585"
+  banned:
+    - "Rabbit"
+    - "Depresso"
+  fall-damage: true
+  lava-equals-fail: true
