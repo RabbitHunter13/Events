@@ -1,8 +1,8 @@
 test:
   owner: "Rabbit_Hunter13"
-  teleport: "1574,70,-5845"
+  teleport: "1574,70,-5845,54,54"
   checkpoints:
-    - "101,50,-4585"
+    - "101,50,-4585,150,150"
   banned:
     - "Rabbit"
     - "Depresso"

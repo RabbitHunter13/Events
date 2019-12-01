@@ -3,7 +3,6 @@ package com.rabbit13.events.main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -125,34 +124,15 @@ public final class Misc {
     }
 
     public static ItemStack getPlayerSkull(String owner) {
-        ItemStack item = new ItemStack(Material.SKELETON_SKULL, 1);
+        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
         if (owner != null) {
             if (item.getItemMeta() != null) {
                 SkullMeta meta = (SkullMeta) item.getItemMeta();
-                meta.setOwningPlayer(Bukkit.getPlayer(owner));
+                meta.setOwner(owner);
                 meta.setDisplayName(owner);
             }
         }
         return item;
-    }
-
-    /**
-     * Translate and parse Strings of names into Enchantmens, while if some name is wrong, message into console about details will be sent
-     *
-     * @param names Collection of names that should be parsed into Collection of Enchantments
-     * @return Collection of Enchantments
-     */
-    public static Collection<Enchantment> parseEnchantments(Collection<String> names) {
-        Collection<Enchantment> parsedEnchants = new ArrayList<>();
-        for (String enchantName : names) {
-            Enchantment i = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
-            if (i == null) {
-                sendLM(Main.getPluginPrefix() + "Wrong enchantment name: " + enchantName, false, Main.getSender());
-            }
-            else
-                parsedEnchants.add(i);
-        }
-        return parsedEnchants;
     }
 
     /**

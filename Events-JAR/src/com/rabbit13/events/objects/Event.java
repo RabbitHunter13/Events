@@ -18,7 +18,6 @@ import java.util.Objects;
 import static com.rabbit13.events.main.Misc.*;
 
 public class Event implements InventoryHolder {
-    private static Event activeEvent;
     private final List<String> checkpoints;
     private final List<String> banned;
     private String name;
@@ -106,11 +105,11 @@ public class Event implements InventoryHolder {
 
     private void initializeItems() {
         modification.addItem(
-                getSpecifiedItem(Material.GRASS, 1,  name),
+                getSpecifiedItem(Material.GRASS, 1, name),
                 getPlayerSkull(owner),
-                getSpecifiedItem(Material.COMMAND_BLOCK, 1,  "Teleport", "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
-                getSpecifiedItem(Material.FEATHER, 1,  "Fall Damage Setting", "Fall damage enabled: " + (fallDamage ? "&a" + true : "&c" + false)),
-                getSpecifiedItem(Material.LAVA_BUCKET, 1,  "Lava Setting", "Lava means Event fail: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
+                getSpecifiedItem(Material.COMMAND, 1, "Teleport", "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
+                getSpecifiedItem(Material.FEATHER, 1, "Fall Damage Setting", "Fall damage enabled: " + (fallDamage ? "&a" + true : "&c" + false)),
+                getSpecifiedItem(Material.LAVA_BUCKET, 1, "Lava Setting", "Lava means Event fail: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
 
         );
     }
@@ -126,7 +125,7 @@ public class Event implements InventoryHolder {
         switch (slot) {
             case 0:
                 name = data;
-                modification.setItem(slot, getSpecifiedItem(Material.GRASS, 1,  name));
+                modification.setItem(slot, getSpecifiedItem(Material.GRASS, 1, name));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                                 .replace("%key%", "name")
                                 .replace("%value%", name)
@@ -157,17 +156,17 @@ public class Event implements InventoryHolder {
         switch (slot) {
             case 2:
                 teleport = new EventLocation(player.getLocation());
-                modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1,  "Teleport", "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
+                modification.setItem(slot, getSpecifiedItem(Material.COMMAND, 1, "Teleport", "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                                 .replace("%key%", "name")
-                                .replace("%value%", "[ x:" + teleport.getX() + "y:" + teleport.getY() + "z:" + teleport.getZ() + "]")
+                                .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")
                         , true
                         , player
                 );
                 break;
             case 3:
                 fallDamage = (!fallDamage);
-                modification.setItem(slot, getSpecifiedItem(Material.FEATHER, 1,  "Fall Damage Setting", "Fall damage enabled: " + (fallDamage ? "&a" + true : "&c" + false)));
+                modification.setItem(slot, getSpecifiedItem(Material.FEATHER, 1, "Fall Damage Setting", "Fall damage enabled: " + (fallDamage ? "&a" + true : "&c" + false)));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                                 .replace("%key%", "Fall_Damage")
                                 .replace("%value%", Boolean.toString(fallDamage))
@@ -176,7 +175,7 @@ public class Event implements InventoryHolder {
                 break;
             case 4:
                 lavaEqualsFail = (!lavaEqualsFail);
-                modification.setItem(slot, getSpecifiedItem(Material.LAVA_BUCKET, 1,  "Fall Damage Setting", "Lava equals fail enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)));
+                modification.setItem(slot, getSpecifiedItem(Material.LAVA_BUCKET, 1, "Fall Damage Setting", "Lava equals fail enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                                 .replace("%key%", "Fall_Damage")
                                 .replace("%value%", Boolean.toString(lavaEqualsFail))
@@ -192,19 +191,6 @@ public class Event implements InventoryHolder {
 
     public boolean getLavaEqualsFail() {
         return lavaEqualsFail;
-    }
-
-    public static Event getActiveEvent() {
-        return activeEvent;
-    }
-
-    public static void setActiveEvent(String activeEvent) {
-        if (activeEvent != null) {
-            Event.activeEvent = EventManager.getEventByName(activeEvent);
-        }
-        else {
-            Event.activeEvent = null;
-        }
     }
 
     public String getName() {

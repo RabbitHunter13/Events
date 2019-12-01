@@ -4,9 +4,9 @@ import com.rabbit13.events.events.PlayerDeathAtContestEvent;
 import com.rabbit13.events.main.Main;
 import com.rabbit13.events.objects.Event;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -14,6 +14,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
@@ -24,22 +25,21 @@ import static com.rabbit13.events.main.Misc.debugMessage;
 import static com.rabbit13.events.main.Misc.sendLM;
 
 public final class ListenerManager implements Listener {
-    private static final HashMap<Player, Location> joinedEvent = new HashMap<>();
     private static final HashMap<Player, Event> modifyingEvent = new HashMap<>();
 
     @EventHandler
     public void onDisconnect(PlayerQuitEvent e) {
-        joinedEvent.remove(e.getPlayer());
+        PlayerManager.getJoinedEvent().remove(e.getPlayer());
         modifyingEvent.remove(e.getPlayer());
     }
 
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
-        if (!e.getPlayer().hasPermission("events.moderator")) {
+        if (!e.getPlayer().hasPermission("events.staff") || !e.getPlayer().hasPermission("events.moderator")) {
             String[] args = e.getMessage().split(" ");
             debugMessage("Arguments: " + Arrays.toString(args));
             //commands here are permitted, or sub-permitted
-            if (joinedEvent.containsKey(e.getPlayer())) {
+            if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
                 if (!args[0].equalsIgnoreCase("/e") && !args[0].equalsIgnoreCase("/event")) {
                     e.setCancelled(true);
                     sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("no-permission-commands"), true, e.getPlayer());
@@ -58,7 +58,7 @@ public final class ListenerManager implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void chooseValueChatEvent(AsyncPlayerChatEvent e) {
         if (modifyingEvent.containsKey(e.getPlayer())) {
             Event event = modifyingEvent.remove(e.getPlayer());
@@ -109,16 +109,18 @@ public final class ListenerManager implements Listener {
             player = (Player) e.getEntity();
         }
         if (player != null) {
-            if (joinedEvent.containsKey(player)) {
+            if (PlayerManager.getJoinedEvent().containsKey(player)) {
                 if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
-                    if (!Event.getActiveEvent().getFallDamage()) {
+                    if (!EventManager.getActiveEvent().getFallDamage()) {
                         e.setCancelled(true);
                     }
                 }
                 else if (e.getCause().equals(EntityDamageEvent.DamageCause.LAVA)) {
-                    if (Event.getActiveEvent().getLavaEqualsFail()) {
+                    if (EventManager.getActiveEvent().getLavaEqualsFail()) {
                         e.setCancelled(true);
-                        player.teleport(joinedEvent.remove(player));
+                        player.teleport(PlayerManager.getJoinedEvent().remove(player));
+                        Bukkit.getScheduler().runTask(Main.getInstance(), () -> e.getEntity().setFireTicks(0));
+                        ((Player) e.getEntity()).setHealth(((Player) e.getEntity()).getMaxHealth());
                         sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-fail"), true, player);
                     }
                 }
@@ -128,13 +130,20 @@ public final class ListenerManager implements Listener {
 
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
-        if (joinedEvent.containsKey(e.getEntity())) {
-            PlayerDeathAtContestEvent event = new PlayerDeathAtContestEvent(e.getEntity().getName(), Event.getActiveEvent().getName());
+        if (PlayerManager.getJoinedEvent().containsKey(e.getEntity())) {
+            PlayerDeathAtContestEvent event = new PlayerDeathAtContestEvent(e.getEntity().getName(), EventManager.getActiveEvent().getName());
             Bukkit.getPluginManager().callEvent(event);
         }
     }
 
-    public HashMap<Player, Location> getJoinedEvent() {
-        return joinedEvent;
+    /**
+     * After player respawn, it would check if he is still at event, if it is, then te respawn point will be at event
+     */
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onRespawn(PlayerRespawnEvent e) {
+        if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
+            e.setRespawnLocation(EventManager.getActiveEvent().getTeleport());
+        }
     }
+
 }

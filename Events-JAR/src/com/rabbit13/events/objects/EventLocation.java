@@ -8,45 +8,25 @@ import org.bukkit.World;
 import java.util.Objects;
 import java.util.logging.Level;
 
-public class EventLocation {
-    private int x;
-    private int y;
-    private int z;
+public class EventLocation extends Location {
 
-    public EventLocation(int x, int y, int z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public EventLocation(double x, double y, double z, float yaw, float pitch) {
+        super(Bukkit.getWorld(Objects.requireNonNull(Main.getInstance().getConfig().getString("event-world"))), x, y, z, yaw, pitch);
     }
 
     public EventLocation(Location l) {
-        this.x = l.getBlockX();
-        this.y = l.getBlockY();
-        this.z = l.getBlockZ();
-
+        super(Bukkit.getWorld(Objects.requireNonNull(Main.getInstance().getConfig().getString("event-world"))), l.getX(), l.getY(), l.getZ(), l.getYaw(), l.getPitch());
     }
 
     @Override
     public String toString() {
-        return x + "," + y + "," + z;
+        return getX() + "," + getY() + "," + getZ() + "," + getYaw() + "," + getPitch();
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public static Location parseBukkitLocation(EventLocation el) {
+    public static Location parseBukkitLocation(double x, double y, double z) {
         World world = Bukkit.getWorld(Objects.requireNonNull(Main.getInstance().getConfig().getString("event-world")));
         if (world != null) {
-            return new Location(world, el.x, el.y, el.z);
+            return new Location(world, x, y, z);
         }
         else {
             Bukkit.getLogger().log(Level.SEVERE, Main.getPrefix() + " " + Main.getFilMan().getWords().getString("world-not-found")

@@ -5,7 +5,7 @@ cze:
   # %event% - event name
   event-created: "&bVytvoril jsi event %event%."
   event-deleted: "&bSmazal jsi event %event%"
-  event-activated: "&bEvent &f%event% &bbyl aktivovan!"
+  event-started: "&bEvent &f%event% &bbyl aktivovan!"
   banned-player-not-found: "&cTento hrac nebyl na eventu %event% zabanovan"
   # %event% - event name, %time% - (/e broadcast 22:00 - time = 22:00)
   event-broadcast: "&e&lEvent &6&l%event% &f&l- Start v &e&l%time%&f&l!"
@@ -29,6 +29,7 @@ cze:
   player-not-found: "&6Tento hrac neni online, nebo neexistuje."
   player-not-found-at-event: "&6Tento hrac neni na eventu."
   player-is-admin: "&cAdminy nemuzes vyhodit ani zabanovat z eventu."
+  config-reloaded: "&bYaml konfigurace byla obnovena"
 
   ##########Player Notification messages#########
   # %event% - event name

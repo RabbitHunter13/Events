@@ -19,14 +19,12 @@ import static com.rabbit13.events.main.Misc.sendLM;
 public final class FileManager {
     private final File path = new File(Main.getInstance().getDataFolder().getPath());
     private final File eventsFile = new File(Main.getInstance().getDataFolder().getPath() + File.separatorChar + "Data", "events.yml");
-
-    private final ConfigurationSection words;
+    private final File langFile = new File(path, "lang.yml");
+    private ConfigurationSection words;
 
     public FileManager() {
         //save files to dataFolder (first time)
         final File readme = new File(path, "readme.txt");
-        final File langFile = new File(path, "lang.yml");
-
         final File[] files = new File[]{langFile, readme};
         for (File f : files) {
             Misc.debugMessage("Proceeding file: " + f.getName());
@@ -53,12 +51,13 @@ public final class FileManager {
             if (!f.getParentFile().exists()) {
                 f.getParentFile().mkdir();
             }
-            try {
-                Misc.copy(Main.getInstance().getResource(f.getName()), f);
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (!f.exists()) {
+                try {
+                    Misc.copy(Main.getInstance().getResource(f.getName()), f);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            loadEventsFromYml(YamlConfiguration.loadConfiguration(eventsFile));
         }
     }
 
@@ -82,14 +81,14 @@ public final class FileManager {
         }
     }
 
-    private static void loadEventsFromYml(YamlConfiguration yml) {
+    public static void loadEventsFromYml(YamlConfiguration yml) {
         if (EventManager.getEvents().size() > 0) {
             EventManager.getEvents().clear();
         }
         //keys = events
         for (String key : yml.getKeys(false)) {
             ConfigurationSection keyconf = yml.getConfigurationSection(key);
-            if(keyconf != null) {
+            if (keyconf != null) {
                 String[] coords = new String[0];
                 String teleport = keyconf.getString("teleport");
                 if (teleport != null) {
@@ -101,34 +100,43 @@ public final class FileManager {
                 String[] checkpoints = keyconf.getStringList("checkpoints").toArray(new String[0]);
                 String[] banned = keyconf.getStringList("banned").toArray(new String[0]);
                 //loading into objects (Map)
-                if (coords.length == 3) {
+                if (coords.length == 5) {
                     try {
                         EventManager.getEvents().put(key, new Event(key
                                 , keyconf.getString("owner")
-                                , new EventLocation(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]), Integer.parseInt(coords[2]))
+                                , new EventLocation(Double.parseDouble(coords[0]), Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Float.parseFloat(coords[3]), Float.parseFloat(coords[4]))
                                 , checkpoints
                                 , banned
                                 , keyconf.getBoolean("fall-damage")
                                 , keyconf.getBoolean("lava-equals-fail")
                         ));
                     } catch (NumberFormatException e) {
-                        Bukkit.getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location have to be \"int,int,int\".");
+                        Bukkit.getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location have to be \"double,dloube,double\".");
                     }
                 }
                 else {
-                    Bukkit.getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location must have 3 positions. (int,int,int)");
+                    Bukkit.getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location must have 5 positions. (x, y, z, yaw, pitch)");
                 }
-            } else {
+            }
+            else {
                 Bukkit.getLogger().log(Level.WARNING, " The Event" + key + " couldn't be loaded");
             }
         }
     }
 
-    public YamlConfiguration getEvents() {
+    public YamlConfiguration getEventsYaml() {
         return YamlConfiguration.loadConfiguration(eventsFile);
+    }
+
+    public File getLangFile() {
+        return langFile;
     }
 
     public ConfigurationSection getWords() {
         return words;
+    }
+
+    public void setWords(ConfigurationSection words) {
+        this.words = words;
     }
 }

@@ -10,6 +10,7 @@ usages:
   - "===Player==="
   - "&b/e &f- &3Join an active event"
   - "&b/e quit &f- &3Leave an active event"
+usages-admin:
   - "===Admin==="
   - "&b/e list - List of all created events"
   - "&b/e create <event> &f- &3Create a new event with teleport where you were standing"
@@ -27,4 +28,4 @@ plugin-prefix: '[Events]'
 #in game prefix
 prefix: '&8[&bEvents&8]'
 #world where events are
-event-world: "Events"
+event-world: "Event"

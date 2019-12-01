@@ -34,6 +34,7 @@ public final class Main extends JavaPlugin {
 
         Misc.sendLM(pluginPrefix + " Starting " + pdf.getFullName(), false, sender); //Starting
         debugMode = getConfig().getBoolean("debug");
+        FileManager.loadEventsFromYml(filMan.getEventsYaml());
         saveDefaultConfig();
         Misc.sendLM(pluginPrefix + " Setting up Events", false, sender); //Events
         getServer().getPluginManager().registerEvents(lisMan, this);
@@ -58,10 +59,6 @@ public final class Main extends JavaPlugin {
 
     public static FileManager getFilMan() {
         return filMan;
-    }
-
-    public static ListenerManager getLisMan() {
-        return lisMan;
     }
 
     public static PluginDescriptionFile getPdf() {
