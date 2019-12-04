@@ -5,13 +5,12 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public final class PlayerLeaveContestEvent extends Event {
+public abstract class PlayerDeathAtContestEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;
     private String contestName;
-    private boolean canceled;
 
-    public PlayerLeaveContestEvent(String playerName, String contestName) {
+    public PlayerDeathAtContestEvent(String playerName, String contestName) {
         this.playerName = playerName;
         this.contestName = contestName;
     }
@@ -20,14 +19,6 @@ public final class PlayerLeaveContestEvent extends Event {
     @Override
     public HandlerList getHandlers() {
         return handlers;
-    }
-
-    public boolean isCanceled() {
-        return canceled;
-    }
-
-    public void setCanceled(boolean canceled) {
-        this.canceled = canceled;
     }
 
     public String getPlayerName() {

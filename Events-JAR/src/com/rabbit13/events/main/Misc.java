@@ -123,12 +123,13 @@ public final class Misc {
         return item;
     }
 
+    @Deprecated
     public static ItemStack getPlayerSkull(String owner) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
         if (owner != null) {
             if (item.getItemMeta() != null) {
                 SkullMeta meta = (SkullMeta) item.getItemMeta();
-                meta.setOwner(owner);
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
                 meta.setDisplayName(owner);
             }
         }

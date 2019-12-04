@@ -4,6 +4,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public final class PlayerJoinContestEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;

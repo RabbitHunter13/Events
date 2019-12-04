@@ -3,9 +3,11 @@ package com.rabbit13.events.managers;
 import com.rabbit13.events.main.Main;
 import com.rabbit13.events.main.Misc;
 import com.rabbit13.events.objects.Event;
-import com.rabbit13.events.objects.EventLocation;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.File;
@@ -63,7 +65,7 @@ public final class FileManager {
 
     public void saveEvents() {
         YamlConfiguration yml = new YamlConfiguration();
-        for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
+        for (Map.Entry<String, Event> entry : ContestManager.getEvents().entrySet()) {
             Event event = entry.getValue();
             ConfigurationSection eventSection = yml.createSection(event.getName());
 
@@ -71,8 +73,12 @@ public final class FileManager {
             eventSection.set("teleport", event.getTeleport().toString());
             eventSection.set("checkpoints", event.getCheckpoints());
             eventSection.set("banned", event.getBanned());
-            eventSection.set("fall-damage", event.getFallDamage());
-            eventSection.set("lava-equals-fail", event.getLavaEqualsFail());
+            ConfigurationSection mods = eventSection.createSection("mods");
+
+            mods.set("fall-damage", event.getMods().getFallDamage());
+            mods.set("lava-equals-fail", event.getMods().getLavaEqualsFail());
+            mods.set("more-hp",event.getMods().getMoreHP());
+            mods.set("rapid-damage", event.getMods().getRapidDamage());
         }
         try {
             yml.save(eventsFile);
@@ -82,8 +88,8 @@ public final class FileManager {
     }
 
     public static void loadEventsFromYml(YamlConfiguration yml) {
-        if (EventManager.getEvents().size() > 0) {
-            EventManager.getEvents().clear();
+        if (ContestManager.getEvents().size() > 0) {
+            ContestManager.getEvents().clear();
         }
         //keys = events
         for (String key : yml.getKeys(false)) {
@@ -95,31 +101,35 @@ public final class FileManager {
                     coords = teleport.split(",");
                 }
                 else {
-                    Bukkit.getLogger().log(Level.SEVERE, "The information about \"teleport\" in " + keyconf.getName() + "is missing!");
+                    Main.getInstance().getLogger().log(Level.SEVERE, "The information about \"teleport\" in " + keyconf.getName() + "is missing!");
                 }
                 String[] checkpoints = keyconf.getStringList("checkpoints").toArray(new String[0]);
                 String[] banned = keyconf.getStringList("banned").toArray(new String[0]);
                 //loading into objects (Map)
-                if (coords.length == 5) {
+                if (coords.length == 6) {
                     try {
-                        EventManager.getEvents().put(key, new Event(key
-                                , keyconf.getString("owner")
-                                , new EventLocation(Double.parseDouble(coords[0]), Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Float.parseFloat(coords[3]), Float.parseFloat(coords[4]))
-                                , checkpoints
-                                , banned
-                                , keyconf.getBoolean("fall-damage")
-                                , keyconf.getBoolean("lava-equals-fail")
+                        World world = Bukkit.getWorld(coords[0]);
+                        if (world == null) {
+                            throw new InvalidConfigurationException();
+                        } // TODO: 04.12.2019 end of school class here
+                        ContestManager.getEvents().put(key, new Event(
+                                key,
+                                keyconf.getString("owner"),
+                                new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5])),
+                                checkpoints,
+                                banned,
+                                keyconf.getConfigurationSection("mods")
                         ));
-                    } catch (NumberFormatException e) {
-                        Bukkit.getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location have to be \"double,dloube,double\".");
+                    } catch (NumberFormatException | InvalidConfigurationException e) {
+                        Main.getInstance().getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location have to be \"world_name, x , y, z, yaw, pitch\".");
                     }
                 }
                 else {
-                    Bukkit.getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location must have 5 positions. (x, y, z, yaw, pitch)");
+                    Main.getInstance().getLogger().log(Level.SEVERE, " Error Loading location in" + keyconf.getName() + " Location must have 6 positions. (world_name, x, y, z, yaw, pitch)");
                 }
             }
             else {
-                Bukkit.getLogger().log(Level.WARNING, " The Event" + key + " couldn't be loaded");
+                Main.getInstance().getLogger().log(Level.WARNING, " The Event" + key + " couldn't be loaded");
             }
         }
     }

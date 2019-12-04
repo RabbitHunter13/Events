@@ -1,9 +1,10 @@
 package com.rabbit13.events.objects;
 
 import com.rabbit13.events.main.Main;
-import com.rabbit13.events.managers.EventManager;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -22,10 +23,9 @@ public class Event implements InventoryHolder {
     private final List<String> banned;
     private String name;
     private String owner;
-    private EventLocation teleport;
+    private EventMods mods;
+    private Location teleport;
     private boolean lockedTeleport;
-    private boolean fallDamage;
-    private boolean lavaEqualsFail;
     private Inventory modification;
     public int modificator;
 
@@ -33,18 +33,17 @@ public class Event implements InventoryHolder {
      * Creates a new event instance.<br>
      * If checkpoints or banned are set to null, a new empty lists of them will be created
      *
-     * @param name           name of this event
-     * @param owner          owner of this event
-     * @param teleport       defines a 3.dimensional point in event world, where player will be teleported after command /e
-     * @param checkpoints    if player steps on checkpoint, it will save that location to /e [ch]eckpoint
-     * @param banned         lists of player names that are banned to come to an event
-     * @param fallDamage     defines if fall damage players (true if fall damage is disabled)
-     * @param lavaEqualsFail defines if falling into lava means disqualifying player
+     * @param name        name of this event
+     * @param owner       owner of this event
+     * @param teleport    defines a 3.dimensional point in event world, where player will be teleported after command /e
+     * @param checkpoints if player steps on checkpoint, it will save that location to /e [ch]eckpoint
+     * @param banned      lists of player names that are banned to come to an event
      */
-    public Event(String name, String owner, EventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned, boolean fallDamage, boolean lavaEqualsFail) {
+    public Event(String name, String owner, Location teleport, @Nullable String[] checkpoints, @Nullable String[] banned, ConfigurationSection confMods) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
+        this.lockedTeleport = false;
         if (checkpoints != null) {
             this.checkpoints = Arrays.asList(checkpoints);
         }
@@ -57,9 +56,8 @@ public class Event implements InventoryHolder {
         else {
             this.banned = new ArrayList<>();
         }
-        this.lockedTeleport = false;
-        this.fallDamage = fallDamage;
-        this.lavaEqualsFail = lavaEqualsFail;
+
+        this.mods = new EventMods(confMods);
         this.modification = Bukkit.createInventory(this, 9, name);
         initializeItems();
     }
@@ -74,12 +72,11 @@ public class Event implements InventoryHolder {
      * @param checkpoints if player steps on checkpoint, it will save that location to /e [ch]eckpoint
      * @param banned      lists of player names that are banned to come to an event
      */
-    public Event(String name, String owner, EventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
+    public Event(String name, String owner, Location teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
-        this.fallDamage = true;
-        this.lavaEqualsFail = true;
+        this.lockedTeleport = false;
         if (checkpoints != null) {
             this.checkpoints = Arrays.asList(checkpoints);
         }
@@ -92,7 +89,8 @@ public class Event implements InventoryHolder {
         else {
             this.banned = new ArrayList<>();
         }
-        this.lockedTeleport = false;
+
+        mods = new EventMods();
         this.modification = Bukkit.createInventory(this, 9, "Event Settings");
         initializeItems();
     }
@@ -103,24 +101,24 @@ public class Event implements InventoryHolder {
         return modification;
     }
 
+    @SuppressWarnings("deprecation")
     private void initializeItems() {
         modification.addItem(
                 getSpecifiedItem(Material.GRASS, 1, name),
                 getPlayerSkull(owner),
-                getSpecifiedItem(Material.COMMAND, 1, "Teleport", "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
-                getSpecifiedItem(Material.FEATHER, 1, "Fall Damage Setting", "Fall damage enabled: " + (fallDamage ? "&a" + true : "&c" + false)),
-                getSpecifiedItem(Material.LAVA_BUCKET, 1, "Lava Setting", "Lava means Event fail: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
-
+                getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
+                getSpecifiedItem(Material.CHEST,1,"Mods")
         );
     }
 
     /**
-     * Set and update values of event
+     * Set and update values of event thru ChatListener
      *
      * @param slot   slot of {@link org.bukkit.inventory.ItemStack ItemStack} that is being updated - holds old modified info
      * @param data   data that is being loaded into value
      * @param player player who clicked
      */
+    @SuppressWarnings("deprecation")
     public void updateItems(int slot, String data, Player player) {
         switch (slot) {
             case 0:
@@ -153,44 +151,17 @@ public class Event implements InventoryHolder {
      * @param player player who clicked
      */
     public void updateItems(int slot, Player player) {
-        switch (slot) {
-            case 2:
-                teleport = new EventLocation(player.getLocation());
-                modification.setItem(slot, getSpecifiedItem(Material.COMMAND, 1, "Teleport", "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
-                sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "name")
-                                .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")
-                        , true
-                        , player
-                );
-                break;
-            case 3:
-                fallDamage = (!fallDamage);
-                modification.setItem(slot, getSpecifiedItem(Material.FEATHER, 1, "Fall Damage Setting", "Fall damage enabled: " + (fallDamage ? "&a" + true : "&c" + false)));
-                sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "Fall_Damage")
-                                .replace("%value%", Boolean.toString(fallDamage))
-                        , true
-                        , player);
-                break;
-            case 4:
-                lavaEqualsFail = (!lavaEqualsFail);
-                modification.setItem(slot, getSpecifiedItem(Material.LAVA_BUCKET, 1, "Fall Damage Setting", "Lava equals fail enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)));
-                sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "Fall_Damage")
-                                .replace("%value%", Boolean.toString(lavaEqualsFail))
-                        , true
-                        , player);
-                break;
+        if (slot == 2) {
+            teleport = player.getLocation();
+            modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
+            sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
+                            .replace("%key%", "name")
+                            .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")
+                    , true
+                    , player
+            );
+            player.closeInventory();
         }
-    }
-
-    public boolean getFallDamage() {
-        return fallDamage;
-    }
-
-    public boolean getLavaEqualsFail() {
-        return lavaEqualsFail;
     }
 
     public String getName() {
@@ -201,7 +172,7 @@ public class Event implements InventoryHolder {
         return owner;
     }
 
-    public EventLocation getTeleport() {
+    public Location getTeleport() {
         return teleport;
     }
 
@@ -211,6 +182,10 @@ public class Event implements InventoryHolder {
 
     public void setLocked(boolean locked) {
         this.lockedTeleport = locked;
+    }
+
+    public EventMods getMods() {
+        return mods;
     }
 
     public List<String> getCheckpoints() {

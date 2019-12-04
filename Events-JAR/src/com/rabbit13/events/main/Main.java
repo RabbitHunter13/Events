@@ -1,8 +1,8 @@
 package com.rabbit13.events.main;
 
 import com.rabbit13.events.commands.MainExecutor;
+import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.FileManager;
-import com.rabbit13.events.managers.ListenerManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -11,11 +11,9 @@ import java.util.Objects;
 
 public final class Main extends JavaPlugin {
     private static boolean debugMode;
-
     private static Main instance;
     //files
     private static FileManager filMan;
-    private static ListenerManager lisMan;
     private static PluginDescriptionFile pdf;
     //values
     private static CommandSender sender;
@@ -26,18 +24,16 @@ public final class Main extends JavaPlugin {
     public void onEnable() {
         instance = this;
         filMan = new FileManager();
-        lisMan = new ListenerManager();
         pdf = getDescription();
         sender = getServer().getConsoleSender();
         prefix = this.getConfig().getString("prefix");
         pluginPrefix = this.getConfig().getString("plugin-prefix");
-
-        Misc.sendLM(pluginPrefix + " Starting " + pdf.getFullName(), false, sender); //Starting
         debugMode = getConfig().getBoolean("debug");
+
         FileManager.loadEventsFromYml(filMan.getEventsYaml());
         saveDefaultConfig();
         Misc.sendLM(pluginPrefix + " Setting up Events", false, sender); //Events
-        getServer().getPluginManager().registerEvents(lisMan, this);
+        getServer().getPluginManager().registerEvents(new EventManager(), this);
         Misc.sendLM(pluginPrefix + " Setting up Executors", false, sender); //Executors
         Objects.requireNonNull(this.getCommand("event")).setExecutor(new MainExecutor());
         super.onEnable();
