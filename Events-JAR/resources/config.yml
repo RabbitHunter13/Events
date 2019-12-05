@@ -8,24 +8,24 @@ debug: false
 lang: "cze"
 usages:
   - "===Player==="
-  - "&b/e &f- &3Join an active event"
-  - "&b/e quit &f- &3Leave an active event"
+  - "&e/e &f- &6Join an active event"
+  - "&e/e quit &f- &6Leave an active event"
 usages-admin:
   - "===Admin==="
-  - "&b/e list - List of all created events"
-  - "&b/e create <event> &f- &3Create a new event with teleport where you were standing"
-  - "&b/e remove <event> &f- &3Delete an event"
-  - "&b/e activate <event> &f- &3Activate an event (people can type /e for join)"
-  - "&b/e end &f- &3Ends an event and teleport all joined players to their last position"
-  - "&b/e modify <event> &f- &3Open a gui of event settings"
-  - "&b/e [b]roadcast <time> &f- &3Broadcast a message about active event"
-  - "&b/e kick <player> &f- &3Kick a player from active event"
-  - "&b/e ban <player> &f- &3Ban a player from active event"
-  - "&b/e unban <player> <event> &f- &3Unban a player on defined event"
-  - "&b/e invclear &f- &3Clear inventory of all joined players"
+  - "&e/e list - List of all created events"
+  - "&e/e create <event> &f- &6Create a new event with teleport where you were standing"
+  - "&e/e remove <event> &f- &6Delete an event"
+  - "&e/e activate <event> &f- &6Activate an event (people can type /e for join)"
+  - "&e/e end &f- &6Ends an event and teleport all joined players to their last position"
+  - "&e/e modify <event> &f- &6Open a gui of event settings"
+  - "&e/e [b]roadcast <text> &f- &6Broadcast a message about active event"
+  - "&e/e kick <player> &f- &6Kick a player from active event"
+  - "&e/e ban <player> &f- &6Ban a player from active event"
+  - "&e/e unban <player> <event> &f- &6Unban a player on defined event"
+  - "&e/e invclear &f- &6Clear inventory of all joined players"
 #in console prefix
 plugin-prefix: '[Events]'
 #in game prefix
-prefix: '&8[&bEvents&8]'
+prefix: '&4[&cEvents&4]&f'
 #world where events are
 event-world: "Event"

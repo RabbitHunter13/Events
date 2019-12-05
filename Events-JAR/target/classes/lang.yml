@@ -3,25 +3,24 @@ cze:
 
   ##########Administration messages##########
   # %event% - event name
-  event-created: "&bVytvoril jsi event %event%."
-  event-deleted: "&bSmazal jsi event %event%"
-  event-started: "&bEvent &f%event% &bbyl aktivovan!"
+  event-created: "&eVytvoril jsi event %event%."
+  event-deleted: "&eSmazal jsi event %event%"
+  event-started: "&eEvent &f%event% &ebyl aktivovan!"
   banned-player-not-found: "&cTento hrac nebyl na eventu %event% zabanovan"
-  # %event% - event name, %time% - (/e broadcast 22:00 - time = 22:00)
-  event-broadcast: "&e&lEvent &6&l%event% &f&l- Start v &e&l%time%&f&l!"
   # %key% and %value% - key = modification like teleport, owner | value = value of modification like [x: 500, y: 45, z: 450] (teleport), Teleriann (owner)
   event-modification-finished: "&aUpravil jsi key %key% na hodnotu &f%value%"
   # %value% - value of key of chosen event
-  event-modification-init: "&e&lNapis novou hodnotu %value% do chatu:"
+  event-modification-init: "&eNapis novou hodnotu %value% do chatu:"
   # %event% - event name, %player% - player name
-  player-banned-admin-side: "&3Hrac %player% byl trvale vyloucen z eventu %event%."
-  player-kicked-admin-side: "&3Hrac %player% byl vyhozen z eventu."
+  player-banned-admin-side: "&6Hrac %player% byl trvale vyloucen z eventu %event%."
+  player-kicked-admin-side: "&6Hrac %player% byl vyhozen z eventu."
   # %world% - event-name in config.yml
   world-not-found: "Svet s nazvem %world% nebyl nalezen."
   #no variable
-  event-list: "&bSeznam eventu:"
-  event-lock: "&bEvent zavren"
-  event-unlock: "&bEvent otevren"
+  event-list-official: "&eSeznam official eventu:"
+  event-list-other: "&eSeznam ostatnich eventu:"
+  event-lock: "&eEvent zavren"
+  event-unlock: "&eEvent otevren"
   event-already-locked: "&6Event je jiz zamkly."
   event-already-unlocked: "&6Event je jiz otevreny."
   event-not-owner: "&cTento event neni tvuj, tudiz ho nemuzes upravovat."
@@ -29,14 +28,14 @@ cze:
   player-not-found: "&6Tento hrac neni online, nebo neexistuje."
   player-not-found-at-event: "&6Tento hrac neni na eventu."
   player-is-admin: "&cAdminy nemuzes vyhodit ani zabanovat z eventu."
-  config-reloaded: "&bYaml konfigurace byla obnovena"
+  config-reloaded: "&eYaml konfigurace byla obnovena"
 
   ##########Player Notification messages#########
   # %event% - event name
-  player-banned-player-side: "&cByl jsi vyloucen z budouciho ucastneni se na eventu &4&l%event%."
-  teleport-success: "&3Byl jsi teleportovan na event &b&l%event%."
+  player-banned-player-side: "&cByl jsi vyloucen z budouciho ucastneni se na eventu &4%event%."
+  teleport-success: "&6Byl jsi teleportovan na event &e%event%."
   #no variable
-  inventory-cleared: "&bInventare vseh hracu na eventu byli smazany"
+  inventory-cleared: "&eInventare vseh hracu na eventu byli smazany"
   no-permission: "&cNa toto nemas opravneni!"
   no-permission-commands: "&cNa eventu nemuzes pouzivat prikazy! Pro odchod pouzij prikaz &6/e quit"
   player-kicked-player-side: "&6Byl jsi vyhozen z eventu."
@@ -44,8 +43,8 @@ cze:
   teleport-banned: "&cNemuzes se pripojit na tento event, protoze jsi byl zabanovan z ucastneni se na tomto eventu."
   active-event-not-found: "&6nebyl nalezen zadny aktivni event."
   event-locked: "&cNa event se jiz nemuzes pripojit."
-  event-leave: "&bOpustil jsi event."
-  event-fail: "&bBohuzel jsi selhal. Preji vice stesti priste :)"
-  event-end: "&e&lEvent skoncil."
+  event-leave: "&eOpustil jsi event."
+  event-fail: "&eBohuzel jsi selhal. Preji vice stesti priste :)"
+  event-end: "&eEvent skoncil."
 
 eng:

@@ -1,6 +1,6 @@
 name: Events
 description: Plugin for moderating events
-version: 1.1 Beta
+version: 1.1.4
 author: Rabbit_Hunter
 main: com.rabbit13.events.main.Main
 api-version: 1.13

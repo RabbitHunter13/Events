@@ -66,7 +66,7 @@ public final class FileManager {
 
     public void saveEvents() {
         YamlConfiguration yml = new YamlConfiguration();
-        for (Map.Entry<String, Event> entry : ContestManager.getEvents().entrySet()) {
+        for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
             Event event = entry.getValue();
             ConfigurationSection eventSection = yml.createSection(event.getName());
 
@@ -89,8 +89,8 @@ public final class FileManager {
     }
 
     public static void loadEventsFromYml(YamlConfiguration yml) {
-        if (ContestManager.getEvents().size() > 0) {
-            ContestManager.getEvents().clear();
+        if (EventManager.getEvents().size() > 0) {
+            EventManager.getEvents().clear();
         }
         //keys = events
         for (String key : yml.getKeys(false)) {
@@ -113,7 +113,7 @@ public final class FileManager {
                         if (world == null) {
                             throw new InvalidConfigurationException();
                         }
-                        ContestManager.getEvents().put(key, new Event(
+                        EventManager.getEvents().put(key, new Event(
                                 key,
                                 keyconf.getString("owner"),
                                 new EventLocation(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5])),

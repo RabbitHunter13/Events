@@ -1,18 +1,20 @@
 package com.rabbit13.events.events;
 
-import org.bukkit.event.Event;
+import com.rabbit13.events.objects.Event;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public abstract class PlayerDeathAtContestEvent extends Event {
+public final class PlayerDeathAtContestEvent extends org.bukkit.event.Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;
-    private String contestName;
+    private Event event;
 
-    public PlayerDeathAtContestEvent(String playerName, String contestName) {
+    public PlayerDeathAtContestEvent(String playerName, Event event) {
         this.playerName = playerName;
-        this.contestName = contestName;
+        this.event = event;
     }
 
     @NotNull
@@ -21,11 +23,11 @@ public abstract class PlayerDeathAtContestEvent extends Event {
         return handlers;
     }
 
-    public String getPlayerName() {
-        return playerName;
+    public Player getPlayer() {
+        return Bukkit.getPlayer(playerName);
     }
 
-    public String getContestName() {
-        return contestName;
+    public Event getEvent() {
+        return event;
     }
 }

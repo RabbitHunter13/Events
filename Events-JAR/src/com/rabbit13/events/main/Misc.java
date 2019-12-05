@@ -32,7 +32,7 @@ public final class Misc {
      */
     public static void sendLM(String s, boolean colors, CommandSender... cs) {
         for (CommandSender c : cs) {
-            c.sendMessage(colors ? ChatColor.translateAlternateColorCodes('&', s) : s);
+            c.sendMessage(colors ? ChatColor.translateAlternateColorCodes('&', s) : ChatColor.stripColor(s));
         }
     }
 

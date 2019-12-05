@@ -99,7 +99,7 @@ public final class EventMods implements InventoryHolder {
                 setMoreHP(!moreHP);
                 modsHolder.setItem(slot, getSpecifiedItem(Material.YELLOW_WOOL, 1, "More HP Mod"
                         , "&fGive Players on event little bit more hp than general maximum "
-                        , "&fMore HP Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
+                        , "&fMore HP Mod Enabled: " + (moreHP ? "&a" + true : "&c" + false))
                 );
 
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
@@ -111,7 +111,7 @@ public final class EventMods implements InventoryHolder {
                 setRapidDamage(!rapidDamage);
                 modsHolder.setItem(slot, getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
                         , "&fNo delay when hitting enemy"
-                        , "&fRapid Damage Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
+                        , "&fRapid Damage Mod Enabled: " + (rapidDamage ? "&a" + true : "&c" + false))
                 );
 
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
@@ -121,7 +121,12 @@ public final class EventMods implements InventoryHolder {
                         , player);
         }
     }
+    @Override
+    public @NotNull Inventory getInventory() {
+        return modsHolder;
+    }
 
+    //Fall Damage Mod
     public boolean getFallDamage() {
         return fallDamage;
     }
@@ -130,6 +135,7 @@ public final class EventMods implements InventoryHolder {
         this.fallDamage = fallDamage;
     }
 
+    //Lava Equals Fail Mod
     public boolean getLavaEqualsFail() {
         return lavaEqualsFail;
     }
@@ -138,6 +144,7 @@ public final class EventMods implements InventoryHolder {
         this.lavaEqualsFail = lavaEqualsFail;
     }
 
+    //More HP Mod
     public boolean getMoreHP() {
         return moreHP;
     }
@@ -146,6 +153,7 @@ public final class EventMods implements InventoryHolder {
         this.moreHP = moreHP;
     }
 
+    //Rapid Damage Mod
     public boolean getRapidDamage() {
         return rapidDamage;
     }
@@ -154,8 +162,4 @@ public final class EventMods implements InventoryHolder {
         this.rapidDamage = rapidDamage;
     }
 
-    @Override
-    public @NotNull Inventory getInventory() {
-        return modsHolder;
-    }
 }

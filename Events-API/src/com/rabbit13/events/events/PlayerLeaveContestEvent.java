@@ -5,7 +5,7 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public abstract class PlayerLeaveContestEvent extends Event {
+public final class PlayerLeaveContestEvent extends Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;
     private String contestName;
