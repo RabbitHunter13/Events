@@ -22,7 +22,6 @@ public final class EventMods implements InventoryHolder {
     private boolean rapidDamage;
 
     public EventMods() {
-        modsHolder = Bukkit.createInventory(this,18, "Mods");
         fallDamage = true;
         lavaEqualsFail = true;
         moreHP = false;
@@ -40,18 +39,19 @@ public final class EventMods implements InventoryHolder {
         initializeItems();
     }
 
-    private void initializeItems(){
+    private void initializeItems() {
+        modsHolder = Bukkit.createInventory(this, 18, "Mods");
         modsHolder.addItem(
                 getSpecifiedItem(Material.WHITE_WOOL, 1, "Fall Damage Mod"
                         , "&fIf Enabled, Fall Damage is not present at this event"
                         , "&fFall damage Enabled: " + (fallDamage ? "&a" + true : "&c" + false)
                 ),
                 getSpecifiedItem(Material.ORANGE_WOOL, 1, "Lava Equals Fail Mod"
-                        ,"If Enabled, Lava automatically kick players out of event"
+                        , "If Enabled, Lava automatically kick players out of event"
                         , "&fLava Equals Fail Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 ),
                 getSpecifiedItem(Material.YELLOW_WOOL, 1, "More HP Mod"
-                        ,"&fGive Players on event little bit more hp than general maximum "
+                        , "&fGive Players on event little bit more hp than general maximum "
                         , "&fMore HP Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 ),
                 getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
@@ -63,7 +63,8 @@ public final class EventMods implements InventoryHolder {
 
     /**
      * Updates values in mods inventory. All of them are boolean values.
-     * @param slot slot that being clicked and updated
+     *
+     * @param slot   slot that being clicked and updated
      * @param player player who updated value
      */
     public void updateItems(int slot, Player player) {
@@ -82,7 +83,7 @@ public final class EventMods implements InventoryHolder {
                         , player);
                 break;
             case 1:
-                setLavaEqualsFail(lavaEqualsFail);
+                setLavaEqualsFail(!lavaEqualsFail);
                 modsHolder.setItem(slot, getSpecifiedItem(Material.ORANGE_WOOL, 1, "Lava Equals Fail Mod"
                         , "If Enabled, Lava automatically kick players out of event"
                         , "&fLava Equals Fail Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
@@ -97,7 +98,7 @@ public final class EventMods implements InventoryHolder {
             case 2:
                 setMoreHP(!moreHP);
                 modsHolder.setItem(slot, getSpecifiedItem(Material.YELLOW_WOOL, 1, "More HP Mod"
-                        ,"&fGive Players on event little bit more hp than general maximum "
+                        , "&fGive Players on event little bit more hp than general maximum "
                         , "&fMore HP Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
                 );
 
@@ -109,7 +110,7 @@ public final class EventMods implements InventoryHolder {
             case 3:
                 setRapidDamage(!rapidDamage);
                 modsHolder.setItem(slot, getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
-                        ,"&fNo delay when hitting enemy"
+                        , "&fNo delay when hitting enemy"
                         , "&fRapid Damage Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
                 );
 
@@ -151,10 +152,6 @@ public final class EventMods implements InventoryHolder {
 
     public void setRapidDamage(boolean rapidDamage) {
         this.rapidDamage = rapidDamage;
-    }
-
-    public int getCount() {
-        return 4;
     }
 
     @Override

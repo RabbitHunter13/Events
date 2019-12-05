@@ -19,6 +19,7 @@ public class PlayerManager {
 
     /**
      * Called when player is about to enter event
+     *
      * @param player player entering event
      * @return data of player (items, potions, and location)
      */
@@ -28,6 +29,7 @@ public class PlayerManager {
                 , player.getInventory().getChestplate()
                 , player.getInventory().getLeggings()
                 , player.getInventory().getBoots()
+                , player.getInventory().getItemInOffHand()
                 , player.getInventory().getContents().clone()
                 , player.getActivePotionEffects()
                 , player.getLocation());
@@ -52,20 +54,22 @@ public class PlayerManager {
      * @param player player leaving event
      */
     public static void playerLeavingEvent(Player player) {
+        debugMessage("Leaving player: " + player);
         Data data = joinedEvent.get(player);
         PlayerInventory inventory = player.getInventory();
         player.teleport(data.getLocation());
+        inventory.setHelmet(data.getHelmet());
+        inventory.setChestplate(data.getChestplate());
+        inventory.setLeggings(data.getLeggings());
+        inventory.setBoots(data.getBoots());
+        inventory.setItemInOffHand(data.getOffHand());
+        inventory.setContents(data.getItems());
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-            inventory.setHelmet(data.getHelmet());
-            inventory.setChestplate(data.getChestplate());
-            inventory.setLeggings(data.getLeggings());
-            inventory.setBoots(data.getBoots());
-            inventory.setContents(data.getItems());
             player.addPotionEffects(data.getEffects());
             player.setFireTicks(0);
-
-            joinedEvent.remove(player);
         });
+
+        joinedEvent.remove(player);
     }
 
     /**

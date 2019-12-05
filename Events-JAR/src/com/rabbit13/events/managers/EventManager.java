@@ -40,8 +40,9 @@ public final class EventManager implements Listener {
                     if (e.getSlot() == 0 || e.getSlot() == 1) {
                         debugMessage("editing string values");
                         PlayerManager.getModifyingEvent().put((Player) e.getWhoClicked(), event);
-                        sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-modification-init"), true, e.getWhoClicked());
                         e.getWhoClicked().closeInventory();
+                        sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-modification-init"), true, e.getWhoClicked());
+
                     }
                     else {
                         debugMessage("editing someting else than string values, no chat listener needed");
@@ -51,14 +52,17 @@ public final class EventManager implements Listener {
                 debugMessage("Clicked item: " + ((item != null) ? item.getType().toString() : "Null"));
                 e.setCancelled(true);
                 break;
-                //Mods inventory
+
             }
             else if (e.getWhoClicked().getOpenInventory().getTopInventory().equals(event.getMods().getInventory())) {
+                //Mods inventory
                 EventMods mods = event.getMods();
                 ItemStack item = mods.getInventory().getItem(e.getSlot());
                 if (item != null) {
                     mods.updateItems(e.getSlot(), (Player) e.getWhoClicked());
                 }
+                debugMessage("Clicked item: " + ((item != null) ? item.getType().toString() : "Null"));
+                e.setCancelled(true);
                 break;
             }
         }
@@ -69,7 +73,8 @@ public final class EventManager implements Listener {
      */
     @EventHandler
     public void onDisconnect(PlayerQuitEvent e) {
-        PlayerManager.playerLeavingEvent(e.getPlayer());
+        if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer()))
+            PlayerManager.playerLeavingEvent(e.getPlayer());
         PlayerManager.getModifyingEvent().remove(e.getPlayer());
     }
 

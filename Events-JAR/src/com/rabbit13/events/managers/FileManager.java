@@ -3,8 +3,8 @@ package com.rabbit13.events.managers;
 import com.rabbit13.events.main.Main;
 import com.rabbit13.events.main.Misc;
 import com.rabbit13.events.objects.Event;
+import com.rabbit13.events.objects.EventLocation;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -18,6 +18,7 @@ import java.util.logging.Level;
 import static com.rabbit13.events.main.Main.getSender;
 import static com.rabbit13.events.main.Misc.sendLM;
 
+@SuppressWarnings("ResultOfMethodCallIgnored")
 public final class FileManager {
     private final File path = new File(Main.getInstance().getDataFolder().getPath());
     private final File eventsFile = new File(Main.getInstance().getDataFolder().getPath() + File.separatorChar + "Data", "events.yml");
@@ -111,11 +112,11 @@ public final class FileManager {
                         World world = Bukkit.getWorld(coords[0]);
                         if (world == null) {
                             throw new InvalidConfigurationException();
-                        } // TODO: 04.12.2019 end of school class here
+                        }
                         ContestManager.getEvents().put(key, new Event(
                                 key,
                                 keyconf.getString("owner"),
-                                new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5])),
+                                new EventLocation(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5])),
                                 checkpoints,
                                 banned,
                                 keyconf.getConfigurationSection("mods")

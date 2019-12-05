@@ -123,6 +123,7 @@ public final class Misc {
         return item;
     }
 
+    @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     public static ItemStack getPlayerSkull(String owner) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
@@ -131,6 +132,7 @@ public final class Misc {
                 SkullMeta meta = (SkullMeta) item.getItemMeta();
                 meta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
                 meta.setDisplayName(owner);
+                item.setItemMeta(meta);
             }
         }
         return item;

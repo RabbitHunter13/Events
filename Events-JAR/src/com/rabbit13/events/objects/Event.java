@@ -2,8 +2,8 @@ package com.rabbit13.events.objects;
 
 import com.rabbit13.events.main.Main;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,7 +24,7 @@ public class Event implements InventoryHolder {
     private String name;
     private String owner;
     private EventMods mods;
-    private Location teleport;
+    private EventLocation teleport;
     private boolean lockedTeleport;
     private Inventory modification;
     public int modificator;
@@ -36,10 +36,10 @@ public class Event implements InventoryHolder {
      * @param name        name of this event
      * @param owner       owner of this event
      * @param teleport    defines a 3.dimensional point in event world, where player will be teleported after command /e
-     * @param checkpoints if player steps on checkpoint, it will save that location to /e [ch]eckpoint
+     * @param checkpoints if player steps on checkpoint, it will save that EventLocation to /e [ch]eckpoint
      * @param banned      lists of player names that are banned to come to an event
      */
-    public Event(String name, String owner, Location teleport, @Nullable String[] checkpoints, @Nullable String[] banned, ConfigurationSection confMods) {
+    public Event(String name, String owner, EventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned, ConfigurationSection confMods) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
@@ -69,10 +69,10 @@ public class Event implements InventoryHolder {
      * @param name        name of this event
      * @param owner       owner of this event
      * @param teleport    defines a 3.dimensional point in event world, where player will be teleported after command /e
-     * @param checkpoints if player steps on checkpoint, it will save that location to /e [ch]eckpoint
+     * @param checkpoints if player steps on checkpoint, it will save that EventLocation to /e [ch]eckpoint
      * @param banned      lists of player names that are banned to come to an event
      */
-    public Event(String name, String owner, Location teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
+    public Event(String name, String owner, EventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
@@ -103,11 +103,12 @@ public class Event implements InventoryHolder {
 
     @SuppressWarnings("deprecation")
     private void initializeItems() {
+        assert teleport.getWorld() != null;
         modification.addItem(
-                getSpecifiedItem(Material.GRASS, 1, name),
+                getSpecifiedItem(Material.GRASS_BLOCK, 1, name),
                 getPlayerSkull(owner),
                 getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
-                getSpecifiedItem(Material.CHEST,1,"Mods")
+                getSpecifiedItem(Material.CHEST, 1, "Mods")
         );
     }
 
@@ -123,7 +124,7 @@ public class Event implements InventoryHolder {
         switch (slot) {
             case 0:
                 name = data;
-                modification.setItem(slot, getSpecifiedItem(Material.GRASS, 1, name));
+                modification.setItem(slot, getSpecifiedItem(Material.GRASS_BLOCK, 1, name));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                                 .replace("%key%", "name")
                                 .replace("%value%", name)
@@ -152,8 +153,10 @@ public class Event implements InventoryHolder {
      */
     public void updateItems(int slot, Player player) {
         if (slot == 2) {
-            teleport = player.getLocation();
-            modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
+            World world = teleport.getWorld();
+            assert world != null;
+            teleport = new EventLocation(player.getLocation());
+            modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + world.getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
             sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                             .replace("%key%", "name")
                             .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")
@@ -161,6 +164,8 @@ public class Event implements InventoryHolder {
                     , player
             );
             player.closeInventory();
+        } else if(slot == 3) {
+            player.openInventory(mods.getInventory());
         }
     }
 
@@ -172,7 +177,7 @@ public class Event implements InventoryHolder {
         return owner;
     }
 
-    public Location getTeleport() {
+    public EventLocation getTeleport() {
         return teleport;
     }
 

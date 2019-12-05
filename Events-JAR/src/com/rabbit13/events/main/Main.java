@@ -1,9 +1,10 @@
 package com.rabbit13.events.main;
 
-import com.rabbit13.events.commands.MainExecutor;
+import com.rabbit13.events.commands.EventExecutor;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.FileManager;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,7 +36,9 @@ public final class Main extends JavaPlugin {
         Misc.sendLM(pluginPrefix + " Setting up Events", false, sender); //Events
         getServer().getPluginManager().registerEvents(new EventManager(), this);
         Misc.sendLM(pluginPrefix + " Setting up Executors", false, sender); //Executors
-        Objects.requireNonNull(this.getCommand("event")).setExecutor(new MainExecutor());
+        PluginCommand eCommand = Objects.requireNonNull(this.getCommand("event"));
+        eCommand.setExecutor(new EventExecutor());
+        //eCommand.setTabCompleter(new EventTabCompleter()); TODO: Let it work!
         super.onEnable();
     }
 

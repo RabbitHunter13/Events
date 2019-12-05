@@ -7,6 +7,7 @@ import com.rabbit13.events.managers.ContestManager;
 import com.rabbit13.events.managers.FileManager;
 import com.rabbit13.events.managers.PlayerManager;
 import com.rabbit13.events.objects.Event;
+import com.rabbit13.events.objects.EventLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -23,11 +24,11 @@ import java.util.Objects;
 import static com.rabbit13.events.main.Misc.debugMessage;
 import static com.rabbit13.events.main.Misc.sendLM;
 
-public final class MainExecutor implements CommandExecutor {
+public final class EventExecutor implements CommandExecutor {
     private static List<String> usages;
     private static List<String> adminUsages;
 
-    public MainExecutor() {
+    public EventExecutor() {
         usages = Main.getInstance().getConfig().getStringList("usages");
         adminUsages = Main.getInstance().getConfig().getStringList("usages-admin");
     }
@@ -55,10 +56,10 @@ public final class MainExecutor implements CommandExecutor {
                             Main.getInstance().getServer().getPluginManager().callEvent(event);
                             if (!event.isCanceled()) {
                                 if (!ContestManager.getActiveEvent().isLocked()) {
-                                    plsender.teleport(ContestManager.getActiveEvent().getTeleport(), PlayerTeleportEvent.TeleportCause.COMMAND);
                                     if (!PlayerManager.getJoinedEvent().containsKey(plsender)) {
                                         PlayerManager.getJoinedEvent().put(plsender, PlayerManager.playerEnteringEvent(plsender));
                                     }
+                                    plsender.teleport(ContestManager.getActiveEvent().getTeleport(), PlayerTeleportEvent.TeleportCause.COMMAND);
                                     sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("teleport-success"))
                                                     .replace("%event%", ContestManager.getActiveEvent().getName())
                                             , true
@@ -226,7 +227,7 @@ public final class MainExecutor implements CommandExecutor {
                     if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.moderator")) {
                         ContestManager.setActiveEvent(null);
                         Main.getInstance().getServer().getOnlinePlayers().forEach(player -> sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-end"), true, player));
-                        PlayerManager.getJoinedEvent().forEach((player, data) -> player.teleport(data.getLocation()));
+                        PlayerManager.getJoinedEvent().forEach((p, d) -> PlayerManager.playerLeavingEvent(p));
                         PlayerManager.getJoinedEvent().clear();
                     }
                     else {
@@ -269,7 +270,7 @@ public final class MainExecutor implements CommandExecutor {
                 }
                 else if (args[0].equalsIgnoreCase("create")) { //done
                     if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.add")) {
-                        Event event = new Event(args[1], plsender.getName(), plsender.getLocation(), null, null);
+                        Event event = new Event(args[1], plsender.getName(), new EventLocation(plsender.getLocation()), null, null);
                         ContestManager.getEvents().put(args[1], event);
                         sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-created")).replace("%event%", args[1]), true, plsender);
                     }
@@ -457,13 +458,18 @@ public final class MainExecutor implements CommandExecutor {
                     sendLM(Main.getPrefix() + " &6Wrong command, type &e" + Objects.requireNonNull(Main.getInstance().getCommand("event")).getUsage() + " for help.", true, plsender);
                 }
             }
-            else {
+            if (args.length > 1) {
                 if (args[0].equalsIgnoreCase("broadcast") || args[0].equalsIgnoreCase("b")) { // TODO: 03.12.2019 broadcast rework
                     if (plsender.hasPermission("events.moderator") || plsender.hasPermission("events.broadcast")) {
                         if (ContestManager.getActiveEvent() != null) {
-                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', Objects.requireNonNull(Main.getFilMan().getWords().getString("event-broadcast"))
-                                    .replace("%event%", ContestManager.getActiveEvent().getName())
-                                    .replace("%time%", args[1])));
+                            String prefix = "&4[&c" + ContestManager.getActiveEvent().getName() + "&4]&f";
+                            StringBuilder message = new StringBuilder();
+                            for (int i = 1; i < args.length; i++) {
+                                if (!args[i].isEmpty()) {
+                                    message.append(" ").append(args[i]);
+                                }
+                            }
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', prefix + message.toString()));
                         }
                     }
                     else
