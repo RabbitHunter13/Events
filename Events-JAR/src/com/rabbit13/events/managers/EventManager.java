@@ -1,15 +1,15 @@
 package com.rabbit13.events.managers;
 
-import com.rabbit13.events.objects.Event;
+import com.rabbit13.events.objects.eEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class EventManager {
-    private static Event activeEvent;
-    private static Map<String, Event> events = new HashMap<>();
+    private static eEvent activeEvent;
+    private static Map<String, eEvent> events = new HashMap<>();
 
-    public static Event getActiveEvent() {
+    public static eEvent getActiveEvent() {
         return activeEvent;
     }
 
@@ -22,11 +22,11 @@ public class EventManager {
         }
     }
 
-    public static Event getEventByName(String name) {
+    public static eEvent getEventByName(String name) {
         return events.get(name);
     }
 
-    public static Map<String, Event> getEvents() {
+    public static Map<String, eEvent> getEvents() {
         return events;
     }
 }

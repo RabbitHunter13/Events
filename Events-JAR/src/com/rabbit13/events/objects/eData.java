@@ -6,7 +6,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.Collection;
 
-public class Data {
+public class eData implements Data {
     private final ItemStack helmet;
     private final ItemStack chestplate;
     private final ItemStack leggings;
@@ -16,7 +16,7 @@ public class Data {
     private final Collection<PotionEffect> effects;
     private final Location location;
 
-    public Data(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots, ItemStack offHand, ItemStack[] items, Collection<PotionEffect> effects, Location location) {
+    public eData(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots, ItemStack offHand, ItemStack[] items, Collection<PotionEffect> effects, Location location) {
         this.helmet = helmet;
         this.chestplate = chestplate;
         this.leggings = leggings;

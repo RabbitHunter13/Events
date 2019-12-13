@@ -14,14 +14,14 @@ import java.util.Objects;
 import static com.rabbit13.events.main.Misc.getSpecifiedItem;
 import static com.rabbit13.events.main.Misc.sendLM;
 
-public final class EventMods implements InventoryHolder {
+public final class eEventMods implements InventoryHolder, EventMods {
     private Inventory modsHolder;
     private boolean fallDamage;
     private boolean lavaEqualsFail;
     private boolean moreHP;
     private boolean rapidDamage;
 
-    public EventMods() {
+    public eEventMods() {
         fallDamage = true;
         lavaEqualsFail = true;
         moreHP = false;
@@ -30,7 +30,7 @@ public final class EventMods implements InventoryHolder {
         initializeItems();
     }
 
-    public EventMods(ConfigurationSection section) {
+    public eEventMods(ConfigurationSection section) {
         fallDamage = section.getBoolean("fall-damage");
         lavaEqualsFail = section.getBoolean("lava-equals-fail");
         moreHP = section.getBoolean("more-hp");

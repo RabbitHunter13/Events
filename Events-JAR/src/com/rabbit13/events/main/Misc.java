@@ -16,11 +16,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.logging.Level;
+
+import static com.rabbit13.events.main.Main.getInstance;
+import static com.rabbit13.events.main.Main.isDebugMode;
 
 
 public final class Misc {
 
-    public Misc() {
+    /**
+     * Denied instantiation
+     */
+    private Misc() {
     }
 
     /**
@@ -34,6 +41,15 @@ public final class Misc {
         for (CommandSender c : cs) {
             c.sendMessage(colors ? ChatColor.translateAlternateColorCodes('&', s) : ChatColor.stripColor(s));
         }
+    }
+
+    /**
+     * Sends error message to console
+     *
+     * @param s text
+     */
+    public static void error(String s) {
+        getInstance().getLogger().log(Level.SEVERE, s);
     }
 
     /**
@@ -55,9 +71,9 @@ public final class Misc {
     /**
      * @param txt - text to be reported via console
      */
-    public static void debugMessage(Object txt) {
-        if (Main.isDebugMode())
-            Bukkit.getServer().getConsoleSender().sendMessage(Main.getPluginPrefix() + ": " + txt);
+    public static void debugMessage(String txt) {
+        if (isDebugMode())
+            getInstance().getLogger().log(Level.INFO, txt);
     }
 
     /**

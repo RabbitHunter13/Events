@@ -3,6 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/Events</output-path>
     <root id="archive" name="Events.jar">
       <element id="module-output" name="Events-JAR" />
+      <element id="module-output" name="Events-API" />
     </root>
   </artifact>
 </component>

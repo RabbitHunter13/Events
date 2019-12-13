@@ -12,6 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Objects;
 
+import static com.rabbit13.events.main.Misc.sendLM;
+
 public final class Main extends JavaPlugin {
     private static boolean debugMode;
     private static Main instance;
@@ -33,12 +35,16 @@ public final class Main extends JavaPlugin {
         pluginPrefix = this.getConfig().getString("plugin-prefix");
         debugMode = getConfig().getBoolean("debug");
 
-        FileManager.loadEventsFromYml(filMan.getEventsYaml());
+        if (filMan.checkWords()) {
+            sendLM(pluginPrefix + "Version of words is changed, adding", false, sender);
+        }
+        filMan.loadEvents();
+        filMan.loadCounter();
         saveDefaultConfig();
-        Misc.sendLM(pluginPrefix + " Setting up Events", false, sender); //Events
+        sendLM(pluginPrefix + " Setting up Listeners", false, sender); //Events
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         getServer().getPluginManager().registerEvents(new ModListener(), this);
-        Misc.sendLM(pluginPrefix + " Setting up Executors", false, sender); //Executors
+        sendLM(pluginPrefix + " Setting up Executors", false, sender); //Executors
         PluginCommand eCommand = Objects.requireNonNull(this.getCommand("event"));
         eCommand.setExecutor(new EventExecutor());
         eCommand.setTabCompleter(new EventTabCompleter());
@@ -48,6 +54,7 @@ public final class Main extends JavaPlugin {
     @Override
     public void onDisable() {
         filMan.saveEvents();
+        filMan.saveCounter();
         super.onDisable();
     }
 

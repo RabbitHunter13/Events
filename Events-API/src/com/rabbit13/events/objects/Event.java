@@ -6,13 +6,13 @@ import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-@SuppressWarnings("unused")
+
 public interface Event extends InventoryHolder {
-    int modificator = 0;
 
     @NotNull
     @Override
     Inventory getInventory();
+
 
     /**
      * Set and update values of event thru ChatListener

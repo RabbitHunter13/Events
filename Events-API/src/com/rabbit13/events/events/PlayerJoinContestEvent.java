@@ -1,5 +1,6 @@
 package com.rabbit13.events.events;
 
+import com.rabbit13.events.objects.Data;
 import com.rabbit13.events.objects.Event;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -7,15 +8,17 @@ import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
-public final class PlayerJoinContestEvent extends org.bukkit.event.Event {
+public abstract class PlayerJoinContestEvent extends org.bukkit.event.Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;
     private Event event;
+    private final Data data;
     private boolean canceled;
 
-    public PlayerJoinContestEvent(String playerName, Event event) {
+    public PlayerJoinContestEvent(String playerName, Event event, Data data) {
         this.playerName = playerName;
         this.event = event;
+        this.data = data;
     }
 
     @NotNull
@@ -34,6 +37,10 @@ public final class PlayerJoinContestEvent extends org.bukkit.event.Event {
 
     public Player getPlayer() {
         return Bukkit.getPlayer(playerName);
+    }
+
+    public Data getPlayerData() {
+        return data;
     }
 
     public Event getEvent() {

@@ -1,11 +1,2 @@
-test:
-  owner: "Rabbit_Hunter13"
-  teleport: "1574,70,-5845,54,54"
-  checkpoints:
-    - "Events,101,50,-4585,150,150"
-  banned:
-    - "Rabbit"
-    - "Depresso"
-  fall-damage: true
-  lava-equals-fail: true
-  yes: tests
+#This yaml is used as save file for events, edit at own risk!
+#If you really want to edit this from here, you have to close your server, or disable events plugin.

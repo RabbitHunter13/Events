@@ -1,11 +1,11 @@
 package com.rabbit13.events.listeners;
 
-import com.rabbit13.events.events.PlayerDeathAtContestEvent;
+import com.rabbit13.events.events.ePlayerDeathAtContestEvent;
 import com.rabbit13.events.main.Main;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.PlayerManager;
-import com.rabbit13.events.objects.Event;
 import com.rabbit13.events.objects.EventMods;
+import com.rabbit13.events.objects.eEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -33,8 +33,8 @@ public final class EventListener implements Listener {
      */
     @EventHandler
     public void onInventoryItemPickup(InventoryClickEvent e) {
-        for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
-            Event event = entry.getValue();
+        for (Map.Entry<String, eEvent> entry : EventManager.getEvents().entrySet()) {
+            eEvent event = entry.getValue();
             if (e.getWhoClicked().getOpenInventory().getTopInventory().equals(event.getInventory())) {
                 event.modificator = e.getSlot();
                 ItemStack item = event.getInventory().getItem(e.getSlot());
@@ -115,7 +115,7 @@ public final class EventListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void chooseValueChatEvent(AsyncPlayerChatEvent e) {
         if (PlayerManager.getModifyingEvent().containsKey(e.getPlayer())) {
-            Event event = PlayerManager.getModifyingEvent().remove(e.getPlayer());
+            eEvent event = PlayerManager.getModifyingEvent().remove(e.getPlayer());
             e.setCancelled(true);
             if (event.modificator == 0) {
                 EventManager.getEvents().remove(event.getName());
@@ -134,7 +134,7 @@ public final class EventListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getEntity())) {
-            PlayerDeathAtContestEvent event = new PlayerDeathAtContestEvent(e.getEntity().getName(), EventManager.getActiveEvent());
+            ePlayerDeathAtContestEvent event = new ePlayerDeathAtContestEvent(e.getEntity().getName(), EventManager.getActiveEvent());
             Bukkit.getPluginManager().callEvent(event);
         }
     }

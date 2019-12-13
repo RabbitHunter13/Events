@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
-@SuppressWarnings("unused")
-public final class PlayerDeathAtContestEvent extends org.bukkit.event.Event {
+
+public abstract class PlayerDeathAtContestEvent extends org.bukkit.event.Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;
     private Event event;

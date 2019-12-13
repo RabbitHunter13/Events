@@ -18,13 +18,13 @@ import java.util.Objects;
 
 import static com.rabbit13.events.main.Misc.*;
 
-public class Event implements InventoryHolder {
+public class eEvent implements InventoryHolder, Event {
     private final List<String> checkpoints;
     private final List<String> banned;
     private String name;
     private String owner;
-    private EventMods mods;
-    private EventLocation teleport;
+    private eEventMods mods;
+    private eEventLocation teleport;
     private boolean lockedTeleport;
     private Inventory modification;
     public int modificator;
@@ -39,7 +39,7 @@ public class Event implements InventoryHolder {
      * @param checkpoints if player steps on checkpoint, it will save that EventLocation to /e [ch]eckpoint
      * @param banned      lists of player names that are banned to come to an event
      */
-    public Event(String name, String owner, EventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned, ConfigurationSection confMods) {
+    public eEvent(String name, String owner, eEventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned, ConfigurationSection confMods) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
@@ -57,7 +57,7 @@ public class Event implements InventoryHolder {
             this.banned = new ArrayList<>();
         }
 
-        this.mods = new EventMods(confMods);
+        this.mods = new eEventMods(confMods);
         this.modification = Bukkit.createInventory(this, 9, name);
         initializeItems();
     }
@@ -72,7 +72,7 @@ public class Event implements InventoryHolder {
      * @param checkpoints if player steps on checkpoint, it will save that EventLocation to /e [ch]eckpoint
      * @param banned      lists of player names that are banned to come to an event
      */
-    public Event(String name, String owner, EventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
+    public eEvent(String name, String owner, eEventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
@@ -90,7 +90,7 @@ public class Event implements InventoryHolder {
             this.banned = new ArrayList<>();
         }
 
-        mods = new EventMods();
+        mods = new eEventMods();
         this.modification = Bukkit.createInventory(this, 9, "Event Settings");
         initializeItems();
     }
@@ -155,7 +155,7 @@ public class Event implements InventoryHolder {
         if (slot == 2) {
             World world = teleport.getWorld();
             assert world != null;
-            teleport = new EventLocation(player.getLocation());
+            teleport = new eEventLocation(player.getLocation());
             modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + world.getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
             sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                             .replace("%key%", "name")
@@ -164,7 +164,8 @@ public class Event implements InventoryHolder {
                     , player
             );
             player.closeInventory();
-        } else if(slot == 3) {
+        }
+        else if (slot == 3) {
             player.openInventory(mods.getInventory());
         }
     }
@@ -177,7 +178,7 @@ public class Event implements InventoryHolder {
         return owner;
     }
 
-    public EventLocation getTeleport() {
+    public eEventLocation getTeleport() {
         return teleport;
     }
 
