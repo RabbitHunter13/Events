@@ -3,6 +3,7 @@ package com.rabbit13.events.commands.tablisteners;
 import com.rabbit13.events.main.Main;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.objects.eEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -15,8 +16,7 @@ import java.util.*;
 import static com.rabbit13.events.main.Misc.debugMessage;
 
 public class EventTabCompleter implements TabCompleter {
-    // TODO: 06.12.2019 permission sorted tab-completing
-    // TODO: 06.12.2019 add new subcommands
+    private int argsLength = 0;
     private static String[] subCommands = new String[]{
             "info", "help", "list",
             "reload", "quit", "lock",
@@ -37,13 +37,20 @@ public class EventTabCompleter implements TabCompleter {
             Collections.addAll(results, subCommands);
         }
         else if (args.length == 2) {
-            if (!args[0].equalsIgnoreCase("win")) {
+            if (args[0].equalsIgnoreCase("backup")) {
+                List<String> names = new ArrayList<>();
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    names.add(player.getName());
+                }
+                results.addAll(names);
+            }
+            else if (args[0].equalsIgnoreCase("win")) {
+                results.addAll(Arrays.asList(winCommands));
+            }
+            else {
                 for (Map.Entry<String, eEvent> entries : EventManager.getEvents().entrySet()) {
                     results.add(entries.getKey());
                 }
-            }
-            else {
-                results.addAll(Arrays.asList(winCommands));
             }
         }
         else if (args.length == 3) {
@@ -56,7 +63,10 @@ public class EventTabCompleter implements TabCompleter {
                 }
             }
         }
-        debugMessage("args: " + Arrays.toString(args));
+        if(argsLength != args.length) {
+            argsLength = args.length;
+            debugMessage("args: " + Arrays.toString(args));
+        }
         return searchAlgoritm(args, results);
     }
 

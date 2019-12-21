@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.rabbit13.events.main.Main.*;
@@ -23,7 +24,14 @@ public class BackupItemsManager {
         YamlConfiguration backup = new YamlConfiguration();
 
         if (data.getItems().length > 0) {
-            backup.set("items", data.getItems());
+            List<ItemStack> items = new ArrayList<>();
+            for (ItemStack item : data.getItems()) {
+                if (item != null) {
+                    items.add(item);
+
+                }
+            }
+            backup.set("items", items);
         }
         try {
             File backupFile = new File(path, player.getName() + ".yml");
