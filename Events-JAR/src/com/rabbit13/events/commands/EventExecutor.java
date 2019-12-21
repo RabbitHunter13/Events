@@ -286,7 +286,6 @@ public final class EventExecutor implements CommandExecutor {
                                     , plsender.getInventory().getChestplate()
                                     , plsender.getInventory().getLeggings()
                                     , plsender.getInventory().getBoots()
-                                    , plsender.getInventory().getItemInOffHand()
                                     , plsender.getInventory().getContents().clone()
                                     , plsender.getActivePotionEffects()
                                     , plsender.getLocation());
@@ -790,7 +789,6 @@ public final class EventExecutor implements CommandExecutor {
             p.getInventory().setChestplate(null);
             p.getInventory().setLeggings(null);
             p.getInventory().setBoots(null);
-            p.getInventory().setItemInOffHand(null);
         });
     }
 

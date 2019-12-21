@@ -11,17 +11,15 @@ public class eData implements Data {
     private final ItemStack chestplate;
     private final ItemStack leggings;
     private final ItemStack boots;
-    private final ItemStack offHand;
     private final ItemStack[] items;
     private final Collection<PotionEffect> effects;
     private final Location location;
 
-    public eData(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots, ItemStack offHand, ItemStack[] items, Collection<PotionEffect> effects, Location location) {
+    public eData(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots, ItemStack[] items, Collection<PotionEffect> effects, Location location) {
         this.helmet = helmet;
         this.chestplate = chestplate;
         this.leggings = leggings;
         this.boots = boots;
-        this.offHand = offHand;
         this.items = items;
         this.effects = effects;
         this.location = location;
@@ -34,7 +32,6 @@ public class eData implements Data {
                 + " Ch: " + (chestplate != null)
                 + " L: " + (leggings != null)
                 + " B: " + (boots != null)
-                + " Off: " + (offHand != null)
                 + " Items: " + items.length
                 + " Effects: " + effects.size()
                 + " Loc: " + location.getWorld().getName()
@@ -55,10 +52,6 @@ public class eData implements Data {
 
     public ItemStack getBoots() {
         return boots;
-    }
-
-    public ItemStack getOffHand() {
-        return offHand;
     }
 
     public ItemStack[] getItems() {

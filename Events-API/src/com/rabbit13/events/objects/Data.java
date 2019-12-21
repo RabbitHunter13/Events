@@ -19,8 +19,6 @@ public interface Data {
 
     ItemStack getBoots();
 
-    ItemStack getOffHand();
-
     ItemStack[] getItems();
 
     Collection<PotionEffect> getEffects();

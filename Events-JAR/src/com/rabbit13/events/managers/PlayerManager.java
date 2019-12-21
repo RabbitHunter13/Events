@@ -4,13 +4,11 @@ import com.rabbit13.events.main.Main;
 import com.rabbit13.events.objects.eData;
 import com.rabbit13.events.objects.eEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.rabbit13.events.main.Misc.debugMessage;
 
@@ -31,7 +29,6 @@ public class PlayerManager {
                 , player.getInventory().getChestplate()
                 , player.getInventory().getLeggings()
                 , player.getInventory().getBoots()
-                , player.getInventory().getItemInOffHand()
                 , player.getInventory().getContents()
                 , player.getActivePotionEffects()
                 , player.getLocation());
@@ -42,7 +39,7 @@ public class PlayerManager {
         player.getInventory().clear();
         player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
         //health set to maximum
-        double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        double maxHealth = player.getMaxHealth();
         debugMessage("Max Health for player " + player.getName() + ": " + maxHealth);
         player.setHealth(maxHealth);
         BackupItemsManager.createBackup(player, data);
@@ -63,7 +60,6 @@ public class PlayerManager {
         inventory.setChestplate(data.getChestplate());
         inventory.setLeggings(data.getLeggings());
         inventory.setBoots(data.getBoots());
-        inventory.setItemInOffHand(data.getOffHand());
         inventory.setContents(data.getItems());
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
             player.addPotionEffects(data.getEffects());
