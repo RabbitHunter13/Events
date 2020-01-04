@@ -8,11 +8,14 @@ import com.rabbit13.events.events.ePlayerLeaveContestEvent;
 import com.rabbit13.events.managers.BackupItemsManager;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.PlayerManager;
+import com.rabbit13.events.objects.Event;
 import com.rabbit13.events.objects.eData;
 import com.rabbit13.events.objects.eEvent;
 import com.rabbit13.events.objects.eEventLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,12 +34,12 @@ public final class EventExecutor implements CommandExecutor {
     private final List<String> usages;
     private final List<String> adminUsages;
 
-    // TODO: 11.12.2019 /event backup list | <player_name> + tab complete
     public EventExecutor() {
         usages = getInstance().getConfig().getStringList("usages");
         adminUsages = getInstance().getConfig().getStringList("usages-admin");
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         boolean pass = false;
@@ -63,9 +66,10 @@ public final class EventExecutor implements CommandExecutor {
                 }
             }
         }
-
+        //<editor-fold desc="Console">
         if (!(sender instanceof Player)) {
             if (args.length == 0) {
+
                 sendLM(getPluginPrefix() + " This command have to be executed as player!", false, sender);
                 return true;
             }
@@ -160,15 +164,20 @@ public final class EventExecutor implements CommandExecutor {
 
             if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("start")) { //done
-                    EventManager.setActiveEvent(args[1]);
                     if (EventManager.getActiveEvent() == null) {
-                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
+                        EventManager.setActiveEvent(args[1]);
+                        if (EventManager.getActiveEvent() == null) {
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
+                        }
+                        else {
+                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-started"))
+                                           .replace("%event%", EventManager.getActiveEvent().getName())
+                                    , true
+                                    , sender);
+                        }
                     }
                     else {
-                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-started"))
-                                        .replace("%event%", EventManager.getActiveEvent().getName())
-                                , true
-                                , sender);
+                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-started"), false, sender);
                     }
                 }
                 else if (args[0].equalsIgnoreCase("remove")) { //done
@@ -189,8 +198,8 @@ public final class EventExecutor implements CommandExecutor {
                                 if (!target.hasPermission("events.staff") || target.hasPermission("events.moderator")) {
                                     PlayerManager.playerLeavingEvent(target);
                                     sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-kicked-admin-side"))
-                                                    .replace("%player%", args[1])
-                                                    .replace("%event%", event.getName())
+                                                   .replace("%player%", args[1])
+                                                   .replace("%event%", event.getName())
                                             , false
                                             , sender);
                                     sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-kicked-player-side"), true, target);
@@ -219,13 +228,13 @@ public final class EventExecutor implements CommandExecutor {
                             if (PlayerManager.getJoinedEvent().containsKey(target)) {
                                 if (!target.hasPermission("events.staff") || target.hasPermission("events.moderator")) {
                                     sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-admin-side"))
-                                                    .replace("%player%", args[1])
-                                                    .replace("%event%", event.getName())
+                                                   .replace("%player%", args[1])
+                                                   .replace("%event%", event.getName())
                                             , false
                                             , sender
                                     );
                                     sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-player-side"))
-                                                    .replace("%event%", event.getName())
+                                                   .replace("%event%", event.getName())
                                             , true
                                             , target);
                                     PlayerManager.playerLeavingEvent(target);
@@ -276,10 +285,12 @@ public final class EventExecutor implements CommandExecutor {
                 return true;
             }
         }
+        //</editor-fold>
+        //<editor-fold desc="Player">
         else {
             Player plsender = (Player) sender;
             if (args.length == 0) {
-                if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.join")) { //done
+                if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.join")) {
                     if (EventManager.getActiveEvent() != null) {
                         if (!EventManager.getActiveEvent().getBanned().contains(plsender.getName())) {
                             eData data = new eData(plsender.getInventory().getHelmet()
@@ -298,7 +309,7 @@ public final class EventExecutor implements CommandExecutor {
                                     }
                                     plsender.teleport(EventManager.getActiveEvent().getTeleport(), PlayerTeleportEvent.TeleportCause.COMMAND);
                                     sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("teleport-success"))
-                                                    .replace("%event%", EventManager.getActiveEvent().getName())
+                                                   .replace("%event%", EventManager.getActiveEvent().getName())
                                             , true
                                             , plsender
                                     );
@@ -377,12 +388,12 @@ public final class EventExecutor implements CommandExecutor {
                     if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.join")) {
                         if (PlayerManager.getWinCounter().get(plsender.getName()) != null) {
                             sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                            .replace("%wins%", PlayerManager.getWinCounter().get(plsender.getName()).toString())
+                                           .replace("%wins%", PlayerManager.getWinCounter().get(plsender.getName()).toString())
                                     , true, plsender);
                         }
                         else {
                             sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                            .replace("%wins%", "0")
+                                           .replace("%wins%", "0")
                                     , true, plsender);
                         }
                     }
@@ -470,7 +481,7 @@ public final class EventExecutor implements CommandExecutor {
                         if (EventManager.getActiveEvent() != null) {
                             plsender.teleport(EventManager.getActiveEvent().getTeleport());
                             sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("teleport-success"))
-                                            .replace("%event%", EventManager.getActiveEvent().getName())
+                                           .replace("%event%", EventManager.getActiveEvent().getName())
                                     , true, plsender);
                         }
                         else {
@@ -511,6 +522,7 @@ public final class EventExecutor implements CommandExecutor {
                         Map<Player, eData> tempHolder = new HashMap<>(PlayerManager.getJoinedEvent());
                         tempHolder.forEach((p, d) -> PlayerManager.playerLeavingEvent(p));
                         PlayerManager.getJoinedEvent().clear();
+                        PlayerManager.getCheckpointed().clear();
                     }
                     else {
                         sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
@@ -534,7 +546,7 @@ public final class EventExecutor implements CommandExecutor {
             if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("create")) { //done
                     if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.add")) {
-                        eEvent event = new eEvent(args[1], plsender.getName(), new eEventLocation(plsender.getLocation()), null, null);
+                        eEvent event = new eEvent(args[1], plsender.getName(), new eEventLocation(plsender.getLocation()));
                         EventManager.getEvents().put(args[1], event);
                         sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-created")).replace("%event%", args[1]), true, plsender);
                     }
@@ -562,7 +574,7 @@ public final class EventExecutor implements CommandExecutor {
                         if (event != null) {
                             plsender.teleport(event.getTeleport());
                             sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("teleport-success"))
-                                            .replace("%event%", event.getName())
+                                           .replace("%event%", event.getName())
                                     , true, plsender);
                         }
                         else {
@@ -575,15 +587,20 @@ public final class EventExecutor implements CommandExecutor {
                 }
                 else if (args[0].equalsIgnoreCase("start")) { //done
                     if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.moderator") || plsender.hasPermission("events.start")) {
-                        EventManager.setActiveEvent(args[1]);
                         if (EventManager.getActiveEvent() == null) {
-                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), true, plsender);
+                            EventManager.setActiveEvent(args[1]);
+                            if (EventManager.getActiveEvent() == null) {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), true, plsender);
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-started"))
+                                               .replace("%event%", EventManager.getActiveEvent().getName())
+                                        , true
+                                        , plsender);
+                            }
                         }
                         else {
-                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-started"))
-                                            .replace("%event%", EventManager.getActiveEvent().getName())
-                                    , true
-                                    , plsender);
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-started"), true, plsender);
                         }
                     }
                     else {
@@ -604,21 +621,36 @@ public final class EventExecutor implements CommandExecutor {
                         if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.moderator") || plsender.hasPermission("events.list")) {
                             if (PlayerManager.getWinCounter().get(plsender.getName()) != null) {
                                 sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                .replace("%wins%", PlayerManager.getWinCounter().get(args[1]).toString())
+                                               .replace("%wins%", PlayerManager.getWinCounter().get(args[1]).toString())
                                         , true, plsender);
                             }
                             else {
                                 sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                .replace("%wins%", "0")
+                                               .replace("%wins%", "0")
                                         , true, plsender);
                             }
                         }
                     }
                 }
-                else if (args[0].equalsIgnoreCase("backup")){
-                    if(plsender.hasPermission("events.staff") || plsender.hasPermission("events.moderator") || plsender.hasPermission("events.backup")){
-                        plsender.openInventory(BackupItemsManager.getBackup(plsender,args[1]));
-                    } else {
+                else if (args[0].equalsIgnoreCase("checkpoint")
+                        || args[0].equalsIgnoreCase("ch")) {
+                    if (plsender.hasPermission("events.checkpoint.use")) {
+                        if (PlayerManager.getCheckpointed().containsKey(plsender)) {
+                            plsender.teleport(PlayerManager.getCheckpointed().get(plsender));
+                        }
+                        else {
+                            plsender.teleport(EventManager.getActiveEvent().getTeleport());
+                        }
+                    }
+                    else {
+                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
+                    }
+                }
+                else if (args[0].equalsIgnoreCase("backup")) {
+                    if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.moderator") || plsender.hasPermission("events.backup")) {
+                        plsender.openInventory(BackupItemsManager.getBackup(plsender, args[1]));
+                    }
+                    else {
                         sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
                     }
                 }
@@ -656,8 +688,8 @@ public final class EventExecutor implements CommandExecutor {
                                     if (!target.hasPermission("events.staff") || target.hasPermission("events.moderator")) {
                                         PlayerManager.playerLeavingEvent(target);
                                         sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-kicked-admin-side"))
-                                                        .replace("%player%", args[1])
-                                                        .replace("%event%", event.getName())
+                                                       .replace("%player%", args[1])
+                                                       .replace("%event%", event.getName())
                                                 , true
                                                 , plsender);
                                         sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-kicked-player-side"), true, target);
@@ -691,13 +723,13 @@ public final class EventExecutor implements CommandExecutor {
                                 if (PlayerManager.getJoinedEvent().containsKey(target)) {
                                     if (!target.hasPermission("events.staff") || target.hasPermission("events.moderator")) {
                                         sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-admin-side"))
-                                                        .replace("%player%", args[1])
-                                                        .replace("%event%", event.getName())
+                                                       .replace("%player%", args[1])
+                                                       .replace("%event%", event.getName())
                                                 , true
                                                 , plsender
                                         );
                                         sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-player-side"))
-                                                        .replace("%event%", event.getName())
+                                                       .replace("%event%", event.getName())
                                                 , true
                                                 , target);
                                         PlayerManager.playerLeavingEvent(target);
@@ -761,13 +793,70 @@ public final class EventExecutor implements CommandExecutor {
                                 PlayerManager.getWinCounter().put(args[2], PlayerManager.getWinCounter().get(args[2]) + 1);
                             }
                             sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-add"))
-                                            .replace("%player%", args[2])
+                                           .replace("%player%", args[2])
                                     , true, plsender);
                             getFilMan().saveCounter();
                         }
                     }
                     else {
                         sendLM(getPrefix() + " &6Wrong command, type &e" + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", true, plsender);
+                    }
+                }
+                else if (args[0].equalsIgnoreCase("checkpoint")) {
+                    if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.moderator") || plsender.hasPermission("events.checkpoint.set")) {
+                        Event event = EventManager.getEvents().get(args[2]);
+                        if (event != null) {
+                            if (plsender.getWorld().equals(event.getTeleport().getLocation().getWorld())) {
+                                if (args[1].equalsIgnoreCase("set")) {
+                                    if (plsender.getWorld().equals(event.getTeleport().getLocation().getWorld())) {
+                                        event.getCheckpoints().add(plsender.getLocation().getBlock().getLocation());
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-added"), true, plsender);
+                                    }
+                                }
+                                else if (args[1].equalsIgnoreCase("remove")) {
+                                    if (event.getCheckpoints().remove(plsender.getLocation().getBlock().getLocation()))
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed"), true, plsender);
+                                    else
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-not-found"), true, plsender);
+                                }
+                                else if (args[1].equalsIgnoreCase("removeall")) {
+                                    event.getCheckpoints().clear();
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed-all"), true, plsender);
+                                }
+                                else if (args[1].equalsIgnoreCase("view")) {
+                                    for (Location chp : event.getCheckpoints()) {
+                                        Location checkpoint = chp.getBlock().getLocation().clone();
+                                        Location checkpointUP = checkpoint.clone().add(0, 1, 0);
+
+                                        plsender.sendBlockChange(checkpoint, Material.WOOL, (byte) 4);
+                                        plsender.sendBlockChange(checkpointUP, Material.WOOL, (byte) 4);
+                                        Timer timer = new Timer();
+                                        timer.schedule(new TimerTask() {
+                                            @Override
+                                            public void run() {
+                                                plsender.sendBlockChange(checkpoint, Material.AIR, (byte) 0);
+                                                plsender.sendBlockChange(checkpointUP, Material.AIR, (byte) 0);
+                                                debugMessage("Def location: " + checkpoint.toString());
+                                                debugMessage("Chp Location: " + checkpointUP.toString());
+                                                timer.cancel();
+                                            }
+                                        }, 10000);
+                                    }
+                                }
+                                else {
+                                    sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("not-same-world-as-event"), true, plsender);
+                            }
+                        }
+                        else {
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), true, plsender);
+                        }
+                    }
+                    else {
+                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
                     }
                 }
                 else {
@@ -779,6 +868,7 @@ public final class EventExecutor implements CommandExecutor {
                 sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
             }
         }
+        //</editor-fold>
         return true;
     }
 

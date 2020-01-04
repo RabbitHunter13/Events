@@ -1,7 +1,6 @@
 package com.rabbit13.events.listeners;
 
 import com.rabbit13.events.events.ePlayerDeathAtContestEvent;
-import com.rabbit13.events.main.Main;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.PlayerManager;
 import com.rabbit13.events.objects.EventMods;
@@ -13,16 +12,15 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.rabbit13.events.main.Main.getFilMan;
+import static com.rabbit13.events.main.Main.getPrefix;
 import static com.rabbit13.events.main.Misc.debugMessage;
 import static com.rabbit13.events.main.Misc.sendLM;
 
@@ -43,8 +41,8 @@ public final class EventListener implements Listener {
                         debugMessage("editing string values");
                         PlayerManager.getModifyingEvent().put((Player) e.getWhoClicked(), event);
                         e.getWhoClicked().closeInventory();
-                        sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-init"))
-                                        .replace("%value%", (e.getSlot() == 0) ? "Name" : "Owner")
+                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-modification-init"))
+                                       .replace("%value%", (e.getSlot() == 0) ? "Name" : "Owner")
                                 , true, e.getWhoClicked());
                     }
                     else {
@@ -93,7 +91,7 @@ public final class EventListener implements Listener {
             if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
                 if (!args[0].equalsIgnoreCase("/e") && !args[0].equalsIgnoreCase("/event")) {
                     e.setCancelled(true);
-                    sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("no-permission-commands"), true, e.getPlayer());
+                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission-commands"), true, e.getPlayer());
                 }
                 else {
                     if (args.length > 1) {
@@ -101,7 +99,7 @@ public final class EventListener implements Listener {
                         debugMessage("Argument 1: " + argument);
                         if (!argument.equalsIgnoreCase("quit") && !argument.equalsIgnoreCase("checkpoint")) {
                             e.setCancelled(true);
-                            sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("no-permission-commands"), true, e.getPlayer());
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission-commands"), true, e.getPlayer());
                         }
                     }
                 }
@@ -145,8 +143,24 @@ public final class EventListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onRespawn(PlayerRespawnEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
-            e.setRespawnLocation(EventManager.getActiveEvent().getTeleport());
+            if (PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
+                e.setRespawnLocation(PlayerManager.getCheckpointed().get(e.getPlayer()));
+            }
+            else {
+                e.setRespawnLocation(EventManager.getActiveEvent().getTeleport());
+            }
         }
     }
 
+    @EventHandler
+    public void onMovement(PlayerMoveEvent e) {
+        if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
+            if (EventManager.getActiveEvent().getCheckpoints().contains(e.getTo().getBlock().getLocation())) {
+                if (!PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
+                    PlayerManager.getCheckpointed().put(e.getPlayer(), e.getTo());
+                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-reached"), true, e.getPlayer());
+                }
+            }
+        }
+    }
 }

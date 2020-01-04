@@ -20,23 +20,23 @@ public interface EventMods extends InventoryHolder {
     @NotNull Inventory getInventory();
 
     //Fall Damage Mod
-    boolean getFallDamage();
-
+    boolean isFallDamage();
     void setFallDamage(boolean fallDamage);
 
     //Lava Equals Fail Mod
-    boolean getLavaEqualsFail();
-
+    boolean isLavaEqualsFail();
     void setLavaEqualsFail(boolean lavaEqualsFail);
 
-    //More HP Mod
-    boolean getMoreHP();
+    //checkpoints mod
+    boolean isActiveCheckpoints();
+    void setActiveCheckpoints(boolean activeCheckpoints);
 
+    //More HP Mod
+    boolean isMoreHP();
     void setMoreHP(boolean moreHP);
 
     //Rapid Damage Mod
-    boolean getRapidDamage();
-
+    boolean isRapidDamage();
     void setRapidDamage(boolean rapidDamage);
 
 }

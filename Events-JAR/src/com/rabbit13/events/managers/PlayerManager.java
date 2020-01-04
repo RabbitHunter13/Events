@@ -4,6 +4,7 @@ import com.rabbit13.events.main.Main;
 import com.rabbit13.events.objects.eData;
 import com.rabbit13.events.objects.eEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -13,8 +14,9 @@ import java.util.Map;
 import static com.rabbit13.events.main.Misc.debugMessage;
 
 public class PlayerManager {
-    private static final HashMap<Player, eData> joinedEvent = new HashMap<>();
-    private static final HashMap<Player, eEvent> modifyingEvent = new HashMap<>();
+    private static final Map<Player, eData> joinedEvent = new HashMap<>();
+    private static final Map<Player, Location> checkpointed = new HashMap<>();
+    private static final Map<Player, eEvent> modifyingEvent = new HashMap<>();
     private static final Map<String, Integer> winCounter = new HashMap<>();
 
     /**
@@ -72,11 +74,18 @@ public class PlayerManager {
     /**
      * @return players that joined active event
      */
-    public static HashMap<Player, eData> getJoinedEvent() {
+    public static Map<Player, eData> getJoinedEvent() {
         return joinedEvent;
     }
 
-    public static HashMap<Player, eEvent> getModifyingEvent() {
+    public static Map<Player, Location> getCheckpointed() {
+        return checkpointed;
+    }
+
+    /**
+     * @return admins that editing event rn
+     */
+    public static Map<Player, eEvent> getModifyingEvent() {
         return modifyingEvent;
     }
 
