@@ -155,7 +155,7 @@ public final class EventListener implements Listener {
     @EventHandler
     public void onMovement(PlayerMoveEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
-            if (EventManager.getActiveEvent().getCheckpoints().contains(e.getTo().getBlock().getLocation())) {
+            if (EventManager.getActiveEvent().getCheckpoints().contains(Objects.requireNonNull(e.getTo()).getBlock().getLocation())) {
                 if (!PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
                     PlayerManager.getCheckpointed().put(e.getPlayer(), e.getTo());
                     sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-reached"), true, e.getPlayer());

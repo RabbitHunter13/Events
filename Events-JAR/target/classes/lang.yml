@@ -21,6 +21,7 @@ cze:
   checkpoint-added: "&aPridal jsi checkpojnt %location%"
   checkpoint-removed: "&6Smazal jsi checkpoint %location%"
   checkpoint-removed-all: "&6Smazal jsi vsechny checkpointy"
+  checkpoint-not-found: "&cNa tvem miste nebyl nalezen zadny checkpoint"
   checkpoint-show: "&ePrave vidis vsechny checkpointy (sklo)"
 
   banned-player-not-found: "&cTento hrac nebyl na eventu %event% zabanovan"

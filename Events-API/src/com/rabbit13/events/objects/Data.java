@@ -11,14 +11,6 @@ public interface Data {
     @Override
     String toString();
 
-    ItemStack getHelmet();
-
-    ItemStack getChestplate();
-
-    ItemStack getLeggings();
-
-    ItemStack getBoots();
-
     ItemStack[] getItems();
 
     Collection<PotionEffect> getEffects();

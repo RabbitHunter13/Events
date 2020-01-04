@@ -105,10 +105,10 @@ public class eEvent implements InventoryHolder, Event {
     private void initializeItems() {
         assert teleport.getWorld() != null;
         modification.addItem(
-                getSpecifiedItem(Material.GRASS, 1, (short) 0, name),
+                getSpecifiedItem(Material.GRASS_BLOCK, 1, name),
                 getPlayerSkull(owner),
-                getSpecifiedItem(Material.COMMAND, 1, (short) 0, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
-                getSpecifiedItem(Material.CHEST, 1, (short) 0, "Mods")
+                getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
+                getSpecifiedItem(Material.CHEST, 1, "Mods")
         );
     }
 
@@ -124,7 +124,7 @@ public class eEvent implements InventoryHolder, Event {
         switch (slot) {
             case 0:
                 name = data;
-                modification.setItem(slot, getSpecifiedItem(Material.GRASS, 1, (short) 0, name));
+                modification.setItem(slot, getSpecifiedItem(Material.GRASS_BLOCK, 1, name));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                                .replace("%key%", "name")
                                .replace("%value%", name)
@@ -156,7 +156,7 @@ public class eEvent implements InventoryHolder, Event {
             World world = teleport.getWorld();
             assert world != null;
             teleport = new eEventLocation(player.getLocation());
-            modification.setItem(slot, getSpecifiedItem(Material.COMMAND, 1, (short) 0, "Teleport", "World: " + world.getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
+            modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + world.getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
             sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                            .replace("%key%", "name")
                            .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")

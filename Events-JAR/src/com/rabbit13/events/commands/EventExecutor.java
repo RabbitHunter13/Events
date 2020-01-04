@@ -16,6 +16,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -39,7 +40,6 @@ public final class EventExecutor implements CommandExecutor {
         adminUsages = getInstance().getConfig().getStringList("usages-admin");
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         boolean pass = false;
@@ -293,11 +293,7 @@ public final class EventExecutor implements CommandExecutor {
                 if (plsender.hasPermission("events.staff") || plsender.hasPermission("events.join")) {
                     if (EventManager.getActiveEvent() != null) {
                         if (!EventManager.getActiveEvent().getBanned().contains(plsender.getName())) {
-                            eData data = new eData(plsender.getInventory().getHelmet()
-                                    , plsender.getInventory().getChestplate()
-                                    , plsender.getInventory().getLeggings()
-                                    , plsender.getInventory().getBoots()
-                                    , plsender.getInventory().getContents().clone()
+                            eData data = new eData(plsender.getInventory().getContents().clone()
                                     , plsender.getActivePotionEffects()
                                     , plsender.getLocation());
                             PlayerJoinContestEvent event = new ePlayerJoinContestEvent(plsender.getName(), EventManager.getActiveEvent(), data);
@@ -828,14 +824,16 @@ public final class EventExecutor implements CommandExecutor {
                                         Location checkpoint = chp.getBlock().getLocation().clone();
                                         Location checkpointUP = checkpoint.clone().add(0, 1, 0);
 
-                                        plsender.sendBlockChange(checkpoint, Material.WOOL, (byte) 4);
-                                        plsender.sendBlockChange(checkpointUP, Material.WOOL, (byte) 4);
+                                        BlockData greenWool = Material.GREEN_WOOL.createBlockData();
+                                        BlockData air = Material.AIR.createBlockData();
+                                        plsender.sendBlockChange(checkpoint, greenWool);
+                                        plsender.sendBlockChange(checkpointUP, greenWool);
                                         Timer timer = new Timer();
                                         timer.schedule(new TimerTask() {
                                             @Override
                                             public void run() {
-                                                plsender.sendBlockChange(checkpoint, Material.AIR, (byte) 0);
-                                                plsender.sendBlockChange(checkpointUP, Material.AIR, (byte) 0);
+                                                plsender.sendBlockChange(checkpoint, air);
+                                                plsender.sendBlockChange(checkpointUP, air);
                                                 debugMessage("Def location: " + checkpoint.toString());
                                                 debugMessage("Chp Location: " + checkpointUP.toString());
                                                 timer.cancel();
@@ -879,6 +877,7 @@ public final class EventExecutor implements CommandExecutor {
             p.getInventory().setChestplate(null);
             p.getInventory().setLeggings(null);
             p.getInventory().setBoots(null);
+            p.getInventory().setItemInOffHand(null);
         });
     }
 

@@ -45,23 +45,23 @@ public final class eEventMods implements InventoryHolder, EventMods {
     private void initializeItems() {
         modsHolder = Bukkit.createInventory(this, 18, "Mods");
         modsHolder.addItem(
-                getSpecifiedItem(Material.WOOL, 1, (short) 0, "Fall Damage Mod"
+                getSpecifiedItem(Material.WHITE_WOOL, 1, "Fall Damage Mod"
                         , "&fIf Enabled, Fall Damage is not present at this event"
                         , "&fFall damage Enabled: " + (fallDamage ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.WOOL, 1, (short) 1, "Lava Equals Fail Mod"
+                getSpecifiedItem(Material.ORANGE_WOOL, 1, "Lava Equals Fail Mod"
                         , "If Enabled, Lava automatically kick players out of event"
                         , "&fLava Equals Fail Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.WOOL, 1, (short) 2, "Checkpoints Activated"
+                getSpecifiedItem(Material.GREEN_WOOL, 1, "Checkpoints Activated"
                         , "If activated, checkpoints will work"
                         , "&fCheckpoints Enabled: " + (activeCheckpoints ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.WOOL, 1, (short) 4, "More HP Mod"
+                getSpecifiedItem(Material.YELLOW_WOOL, 1,  "More HP Mod"
                         , "&fGive Players on event little bit more hp than general maximum "
                         , "&fMore HP Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.WOOL, 1, (short) 14, "Rapid Damage Mod"
+                getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
                         , "&fNo delay when hitting enemy"
                         , "&fRapid Damage Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 )
@@ -78,7 +78,7 @@ public final class eEventMods implements InventoryHolder, EventMods {
         switch (slot) {
             case 0:
                 setFallDamage(!fallDamage);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 0, "Fall Damage Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.WHITE_WOOL, 1, "Fall Damage Mod"
                         , "&fIf Enabled, Fall Damage is not present at this event"
                         , "&fFall damage Enabled: " + (fallDamage ? "&a" + true : "&c" + false))
                 );
@@ -91,7 +91,7 @@ public final class eEventMods implements InventoryHolder, EventMods {
                 break;
             case 1:
                 setLavaEqualsFail(!lavaEqualsFail);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 1, "Lava Equals Fail Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.ORANGE_WOOL, 1, "Lava Equals Fail Mod"
                         , "If Enabled, Lava automatically kick players out of event"
                         , "&fLava Equals Fail Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
                 );
@@ -104,7 +104,7 @@ public final class eEventMods implements InventoryHolder, EventMods {
                 break;
             case 2:
                 setActiveCheckpoints(!activeCheckpoints);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 2, "Checkpoints Activated"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.GREEN_WOOL, 1, "Checkpoints Activated"
                         , "If activated, checkpoints will work"
                         , "&fCheckpoints Enabled: " + (activeCheckpoints ? "&a" + true : "&c" + false))
                 );
@@ -116,7 +116,7 @@ public final class eEventMods implements InventoryHolder, EventMods {
                         , player);
             case 3:
                 setMoreHP(!moreHP);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 4, "More HP Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.YELLOW_WOOL, 1, "More HP Mod"
                         , "&fGive Players on event little bit more hp than general maximum "
                         , "&fMore HP Mod Enabled: " + (moreHP ? "&a" + true : "&c" + false))
                 );
@@ -128,7 +128,7 @@ public final class eEventMods implements InventoryHolder, EventMods {
                         , player);
             case 4:
                 setRapidDamage(!rapidDamage);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 14, "Rapid Damage Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
                         , "&fNo delay when hitting enemy"
                         , "&fRapid Damage Mod Enabled: " + (rapidDamage ? "&a" + true : "&c" + false))
                 );
