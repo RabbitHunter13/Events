@@ -2,6 +2,7 @@ package com.rabbit13.events.objects;
 
 import com.rabbit13.events.main.Main;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
@@ -19,7 +20,7 @@ import java.util.Objects;
 import static com.rabbit13.events.main.Misc.*;
 
 public class eEvent implements InventoryHolder, Event {
-    private final List<String> checkpoints;
+    private final List<Location> checkpoints;
     private final List<String> banned;
     private String name;
     private String owner;
@@ -45,7 +46,18 @@ public class eEvent implements InventoryHolder, Event {
         this.teleport = teleport;
         this.lockedTeleport = false;
         if (checkpoints != null) {
-            this.checkpoints = Arrays.asList(checkpoints);
+            List<Location> locCheckpoints = new ArrayList<>();
+            for (String checkpoint : checkpoints) {
+                try {
+                    assert checkpoint != null;
+                    String[] splitted = checkpoint.split(",");
+                    double[] splittedParsed = {Double.parseDouble(splitted[0]), Double.parseDouble(splitted[1]), Double.parseDouble(splitted[2])};
+                    locCheckpoints.add(new Location(teleport.getLocation().getWorld(),splittedParsed[0], splittedParsed[1], splittedParsed[2]));
+                } catch (NumberFormatException e) {
+                    e.printStackTrace();
+                }
+            }
+            this.checkpoints = locCheckpoints;
         }
         else {
             this.checkpoints = new ArrayList<>();
@@ -57,58 +69,46 @@ public class eEvent implements InventoryHolder, Event {
             this.banned = new ArrayList<>();
         }
 
-        this.mods = new eEventMods(confMods);
-        this.modification = Bukkit.createInventory(this, 9, name);
+        if (confMods != null) {
+            this.mods = new eEventMods(confMods);
+        }
+        else {
+            this.mods = new eEventMods();
+        }
+
+        this.modification = Bukkit.createInventory(this, 9, "Event Settings: " + name);
         initializeItems();
     }
 
     /**
-     * Creates a new event instance. This Constructor is uded for command creation<br>
+     * Creates a new event instance. This Constructor is used for command creation<br>
      * If checkpoints or banned are set to null, a new empty lists of them will be created
      *
      * @param name        name of this event
      * @param owner       owner of this event
      * @param teleport    defines a 3.dimensional point in event world, where player will be teleported after command /e
-     * @param checkpoints if player steps on checkpoint, it will save that EventLocation to /e [ch]eckpoint
-     * @param banned      lists of player names that are banned to come to an event
      */
-    public eEvent(String name, String owner, eEventLocation teleport, @Nullable String[] checkpoints, @Nullable String[] banned) {
+    public eEvent(String name, String owner, eEventLocation teleport) {
         this.name = name;
         this.owner = owner;
         this.teleport = teleport;
         this.lockedTeleport = false;
-        if (checkpoints != null) {
-            this.checkpoints = Arrays.asList(checkpoints);
-        }
-        else {
-            this.checkpoints = new ArrayList<>();
-        }
-        if (banned != null) {
-            this.banned = Arrays.asList(banned);
-        }
-        else {
-            this.banned = new ArrayList<>();
-        }
+        this.checkpoints = new ArrayList<>();
+        this.banned = new ArrayList<>();
 
         mods = new eEventMods();
-        this.modification = Bukkit.createInventory(this, 9, "Event Settings");
+        this.modification = Bukkit.createInventory(this, 9, "Event Settings: " + name);
         initializeItems();
-    }
-
-    @NotNull
-    @Override
-    public Inventory getInventory() {
-        return modification;
     }
 
     @SuppressWarnings("deprecation")
     private void initializeItems() {
         assert teleport.getWorld() != null;
         modification.addItem(
-                getSpecifiedItem(Material.GRASS_BLOCK, 1, name),
+                getSpecifiedItem(Material.GRASS, 1, (short) 0, name),
                 getPlayerSkull(owner),
-                getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
-                getSpecifiedItem(Material.CHEST, 1, "Mods")
+                getSpecifiedItem(Material.COMMAND, 1, (short) 0, "Teleport", "World: " + teleport.getWorld().getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()),
+                getSpecifiedItem(Material.CHEST, 1, (short) 0, "Mods")
         );
     }
 
@@ -124,10 +124,10 @@ public class eEvent implements InventoryHolder, Event {
         switch (slot) {
             case 0:
                 name = data;
-                modification.setItem(slot, getSpecifiedItem(Material.GRASS_BLOCK, 1, name));
+                modification.setItem(slot, getSpecifiedItem(Material.GRASS, 1, (short) 0, name));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "name")
-                                .replace("%value%", name)
+                               .replace("%key%", "name")
+                               .replace("%value%", name)
                         , true
                         , player
                 );
@@ -136,8 +136,8 @@ public class eEvent implements InventoryHolder, Event {
                 owner = data;
                 modification.setItem(slot, getPlayerSkull(owner));
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "owner")
-                                .replace("%value%", owner)
+                               .replace("%key%", "owner")
+                               .replace("%value%", owner)
                         , true
                         , player
                 );
@@ -156,10 +156,10 @@ public class eEvent implements InventoryHolder, Event {
             World world = teleport.getWorld();
             assert world != null;
             teleport = new eEventLocation(player.getLocation());
-            modification.setItem(slot, getSpecifiedItem(Material.COMMAND_BLOCK, 1, "Teleport", "World: " + world.getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
+            modification.setItem(slot, getSpecifiedItem(Material.COMMAND, 1, (short) 0, "Teleport", "World: " + world.getName(), "&fx: " + teleport.getX(), "&fy: " + teleport.getY(), "&fz: " + teleport.getZ()));
             sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                            .replace("%key%", "name")
-                            .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")
+                           .replace("%key%", "name")
+                           .replace("%value%", "&8[&6x:&e" + (int) teleport.getX() + " &6y:&e" + (int) teleport.getY() + " &6z:&e" + (int) teleport.getZ() + "&8]")
                     , true
                     , player
             );
@@ -194,11 +194,17 @@ public class eEvent implements InventoryHolder, Event {
         return mods;
     }
 
-    public List<String> getCheckpoints() {
+    public List<Location> getCheckpoints() {
         return checkpoints;
     }
 
     public List<String> getBanned() {
         return banned;
+    }
+
+    @NotNull
+    @Override
+    public Inventory getInventory() {
+        return modification;
     }
 }

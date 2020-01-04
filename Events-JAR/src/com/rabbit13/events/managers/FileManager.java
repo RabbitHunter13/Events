@@ -135,10 +135,10 @@ public final class FileManager {
             eventSection.set("banned", event.getBanned());
             ConfigurationSection mods = eventSection.createSection("mods");
 
-            mods.set("fall-damage", event.getMods().getFallDamage());
-            mods.set("lava-equals-fail", event.getMods().getLavaEqualsFail());
-            mods.set("more-hp", event.getMods().getMoreHP());
-            mods.set("rapid-damage", event.getMods().getRapidDamage());
+            mods.set("fall-damage", event.getMods().isFallDamage());
+            mods.set("lava-equals-fail", event.getMods().isLavaEqualsFail());
+            mods.set("more-hp", event.getMods().isMoreHP());
+            mods.set("rapid-damage", event.getMods().isRapidDamage());
         }
         try {
             yml.save(eventsFile);

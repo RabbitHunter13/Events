@@ -18,12 +18,14 @@ public final class eEventMods implements InventoryHolder, EventMods {
     private Inventory modsHolder;
     private boolean fallDamage;
     private boolean lavaEqualsFail;
+    private boolean activeCheckpoints;
     private boolean moreHP;
     private boolean rapidDamage;
 
     public eEventMods() {
         fallDamage = true;
         lavaEqualsFail = true;
+        activeCheckpoints = true;
         moreHP = false;
         rapidDamage = false;
 
@@ -31,10 +33,11 @@ public final class eEventMods implements InventoryHolder, EventMods {
     }
 
     public eEventMods(ConfigurationSection section) {
-        fallDamage = section.getBoolean("fall-damage");
-        lavaEqualsFail = section.getBoolean("lava-equals-fail");
-        moreHP = section.getBoolean("more-hp");
-        rapidDamage = section.getBoolean("rapid-dmg");
+        fallDamage = section.getBoolean("fall-damage", false);
+        lavaEqualsFail = section.getBoolean("lava-equals-fail", true);
+        activeCheckpoints = section.getBoolean("checkpoints-activated", true);
+        moreHP = section.getBoolean("more-hp", false);
+        rapidDamage = section.getBoolean("rapid-dmg", false);
 
         initializeItems();
     }
@@ -42,19 +45,23 @@ public final class eEventMods implements InventoryHolder, EventMods {
     private void initializeItems() {
         modsHolder = Bukkit.createInventory(this, 18, "Mods");
         modsHolder.addItem(
-                getSpecifiedItem(Material.WHITE_WOOL, 1, "Fall Damage Mod"
+                getSpecifiedItem(Material.WOOL, 1, (short) 0, "Fall Damage Mod"
                         , "&fIf Enabled, Fall Damage is not present at this event"
                         , "&fFall damage Enabled: " + (fallDamage ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.ORANGE_WOOL, 1, "Lava Equals Fail Mod"
+                getSpecifiedItem(Material.WOOL, 1, (short) 1, "Lava Equals Fail Mod"
                         , "If Enabled, Lava automatically kick players out of event"
                         , "&fLava Equals Fail Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.YELLOW_WOOL, 1, "More HP Mod"
+                getSpecifiedItem(Material.WOOL, 1, (short) 2, "Checkpoints Activated"
+                        , "If activated, checkpoints will work"
+                        , "&fCheckpoints Enabled: " + (activeCheckpoints ? "&a" + true : "&c" + false)
+                ),
+                getSpecifiedItem(Material.WOOL, 1, (short) 4, "More HP Mod"
                         , "&fGive Players on event little bit more hp than general maximum "
                         , "&fMore HP Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 ),
-                getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
+                getSpecifiedItem(Material.WOOL, 1, (short) 14, "Rapid Damage Mod"
                         , "&fNo delay when hitting enemy"
                         , "&fRapid Damage Mod Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false)
                 )
@@ -71,93 +78,110 @@ public final class eEventMods implements InventoryHolder, EventMods {
         switch (slot) {
             case 0:
                 setFallDamage(!fallDamage);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.WHITE_WOOL, 1, "Fall Damage Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 0, "Fall Damage Mod"
                         , "&fIf Enabled, Fall Damage is not present at this event"
                         , "&fFall damage Enabled: " + (fallDamage ? "&a" + true : "&c" + false))
                 );
 
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "Fall_Damage")
-                                .replace("%value%", Boolean.toString(fallDamage))
+                               .replace("%key%", "Fall_Damage")
+                               .replace("%value%", Boolean.toString(fallDamage))
                         , true
                         , player);
                 break;
             case 1:
                 setLavaEqualsFail(!lavaEqualsFail);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.ORANGE_WOOL, 1, "Lava Equals Fail Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 1, "Lava Equals Fail Mod"
                         , "If Enabled, Lava automatically kick players out of event"
                         , "&fLava Equals Fail Enabled: " + (lavaEqualsFail ? "&a" + true : "&c" + false))
                 );
 
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "Lava_Equals_Fail")
-                                .replace("%value%", Boolean.toString(lavaEqualsFail))
+                               .replace("%key%", "Lava_Equals_Fail")
+                               .replace("%value%", Boolean.toString(lavaEqualsFail))
                         , true
                         , player);
                 break;
             case 2:
+                setActiveCheckpoints(!activeCheckpoints);
+                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 2, "Checkpoints Activated"
+                        , "If activated, checkpoints will work"
+                        , "&fCheckpoints Enabled: " + (activeCheckpoints ? "&a" + true : "&c" + false))
+                );
+
+                sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
+                               .replace("%key%", "Active Checkpoints")
+                               .replace("%value%", Boolean.toString(activeCheckpoints))
+                        , true
+                        , player);
+            case 3:
                 setMoreHP(!moreHP);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.YELLOW_WOOL, 1, "More HP Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 4, "More HP Mod"
                         , "&fGive Players on event little bit more hp than general maximum "
                         , "&fMore HP Mod Enabled: " + (moreHP ? "&a" + true : "&c" + false))
                 );
 
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "More_HP")
-                                .replace("%value%", Boolean.toString(moreHP))
+                               .replace("%key%", "More_HP")
+                               .replace("%value%", Boolean.toString(moreHP))
                         , true
                         , player);
-            case 3:
+            case 4:
                 setRapidDamage(!rapidDamage);
-                modsHolder.setItem(slot, getSpecifiedItem(Material.RED_WOOL, 1, "Rapid Damage Mod"
+                modsHolder.setItem(slot, getSpecifiedItem(Material.WOOL, 1, (short) 14, "Rapid Damage Mod"
                         , "&fNo delay when hitting enemy"
                         , "&fRapid Damage Mod Enabled: " + (rapidDamage ? "&a" + true : "&c" + false))
                 );
 
                 sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
-                                .replace("%key%", "Rapid_Damage")
-                                .replace("%value%", Boolean.toString(rapidDamage))
+                               .replace("%key%", "Rapid_Damage")
+                               .replace("%value%", Boolean.toString(rapidDamage))
                         , true
                         , player);
         }
     }
+
     @Override
     public @NotNull Inventory getInventory() {
         return modsHolder;
     }
 
     //Fall Damage Mod
-    public boolean getFallDamage() {
+    public boolean isFallDamage() {
         return fallDamage;
     }
-
     public void setFallDamage(boolean fallDamage) {
         this.fallDamage = fallDamage;
     }
 
     //Lava Equals Fail Mod
-    public boolean getLavaEqualsFail() {
+    public boolean isLavaEqualsFail() {
         return lavaEqualsFail;
     }
-
     public void setLavaEqualsFail(boolean lavaEqualsFail) {
         this.lavaEqualsFail = lavaEqualsFail;
     }
 
-    //More HP Mod
-    public boolean getMoreHP() {
-        return moreHP;
+    //Checkpoints
+    public boolean isActiveCheckpoints() {
+        return activeCheckpoints;
+    }
+    public void setActiveCheckpoints(boolean activeCheckpoints) {
+        this.activeCheckpoints = activeCheckpoints;
     }
 
+    //More HP Mod
+    public boolean isMoreHP() {
+        return moreHP;
+    }
     public void setMoreHP(boolean moreHP) {
         this.moreHP = moreHP;
     }
 
     //Rapid Damage Mod
-    public boolean getRapidDamage() {
+    public boolean isRapidDamage() {
         return rapidDamage;
     }
-
     public void setRapidDamage(boolean rapidDamage) {
         this.rapidDamage = rapidDamage;
     }

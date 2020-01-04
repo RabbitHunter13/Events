@@ -1,5 +1,6 @@
 package com.rabbit13.events.objects;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -43,7 +44,7 @@ public interface Event extends InventoryHolder {
 
     EventMods getMods();
 
-    List<String> getCheckpoints();
+    List<Location> getCheckpoints();
 
     List<String> getBanned();
 }

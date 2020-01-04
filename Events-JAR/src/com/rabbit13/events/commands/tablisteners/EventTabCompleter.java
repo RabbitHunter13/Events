@@ -23,11 +23,15 @@ public class EventTabCompleter implements TabCompleter {
             "unlock", "tp", "modify",
             "end", "invclear", "debug",
             "create", "remove", "start",
-            "kick", "ban", "unban",
+            "kick", "ban", "unban", "checkpoint",
             "broadcast", "win", "backup"
     };
     private static String[] winCommands = new String[]{
             "list", "add"
+    };
+
+    private static String[] checkpointCommands = new String[]{
+            "set", "remove", "removeall", "view"
     };
 
     @Override
@@ -46,6 +50,9 @@ public class EventTabCompleter implements TabCompleter {
             }
             else if (args[0].equalsIgnoreCase("win")) {
                 results.addAll(Arrays.asList(winCommands));
+            }
+            else if (args[0].equalsIgnoreCase("checkpoint")) {
+                results.addAll(Arrays.asList(checkpointCommands));
             }
             else {
                 for (Map.Entry<String, eEvent> entries : EventManager.getEvents().entrySet()) {

@@ -4,19 +4,19 @@ import com.rabbit13.events.main.Main;
 import com.rabbit13.events.objects.eData;
 import com.rabbit13.events.objects.eEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.attribute.Attribute;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.rabbit13.events.main.Misc.debugMessage;
 
 public class PlayerManager {
-    private static final HashMap<Player, eData> joinedEvent = new HashMap<>();
-    private static final HashMap<Player, eEvent> modifyingEvent = new HashMap<>();
+    private static final Map<Player, eData> joinedEvent = new HashMap<>();
+    private static final Map<Player, Location> checkpointed = new HashMap<>();
+    private static final Map<Player, eEvent> modifyingEvent = new HashMap<>();
     private static final Map<String, Integer> winCounter = new HashMap<>();
 
     /**
@@ -31,7 +31,6 @@ public class PlayerManager {
                 , player.getInventory().getChestplate()
                 , player.getInventory().getLeggings()
                 , player.getInventory().getBoots()
-                , player.getInventory().getItemInOffHand()
                 , player.getInventory().getContents()
                 , player.getActivePotionEffects()
                 , player.getLocation());
@@ -42,7 +41,7 @@ public class PlayerManager {
         player.getInventory().clear();
         player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
         //health set to maximum
-        double maxHealth = Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getValue();
+        double maxHealth = player.getMaxHealth();
         debugMessage("Max Health for player " + player.getName() + ": " + maxHealth);
         player.setHealth(maxHealth);
         BackupItemsManager.createBackup(player, data);
@@ -63,7 +62,6 @@ public class PlayerManager {
         inventory.setChestplate(data.getChestplate());
         inventory.setLeggings(data.getLeggings());
         inventory.setBoots(data.getBoots());
-        inventory.setItemInOffHand(data.getOffHand());
         inventory.setContents(data.getItems());
         Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
             player.addPotionEffects(data.getEffects());
@@ -76,11 +74,18 @@ public class PlayerManager {
     /**
      * @return players that joined active event
      */
-    public static HashMap<Player, eData> getJoinedEvent() {
+    public static Map<Player, eData> getJoinedEvent() {
         return joinedEvent;
     }
 
-    public static HashMap<Player, eEvent> getModifyingEvent() {
+    public static Map<Player, Location> getCheckpointed() {
+        return checkpointed;
+    }
+
+    /**
+     * @return admins that editing event rn
+     */
+    public static Map<Player, eEvent> getModifyingEvent() {
         return modifyingEvent;
     }
 

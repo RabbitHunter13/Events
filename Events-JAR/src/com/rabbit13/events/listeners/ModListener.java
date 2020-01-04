@@ -22,12 +22,12 @@ public class ModListener implements Listener {
             player = (Player) e.getEntity();
             if (PlayerManager.getJoinedEvent().containsKey(player)) {
                 if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
-                    if (!EventManager.getActiveEvent().getMods().getFallDamage()) {
+                    if (!EventManager.getActiveEvent().getMods().isFallDamage()) {
                         e.setCancelled(true);
                     }
                 }
                 else if (e.getCause().equals(EntityDamageEvent.DamageCause.LAVA)) {
-                    if (EventManager.getActiveEvent().getMods().getLavaEqualsFail()) {
+                    if (EventManager.getActiveEvent().getMods().isLavaEqualsFail()) {
                         e.setCancelled(true);
                         PlayerManager.playerLeavingEvent(player);
                         sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-fail"), true, player);
