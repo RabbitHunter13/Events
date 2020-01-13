@@ -1,8 +1,10 @@
 name: Events
 description: Plugin for moderating events
-version: 1.3.0b(2)
-author: Rabbit_Hunter
+version: 1.3.4r(3)
+author: Rabbit_Hunter13
+
 main: com.rabbit13.events.main.Main
+api-version: "1.13"
 commands:
   event:
     description: "command for moderating events and creating eventplaces"

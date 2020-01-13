@@ -1,6 +1,6 @@
 package com.rabbit13.events.events;
 
-import com.rabbit13.events.objects.Event;
+import com.rabbit13.events.objects.event.Event;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;

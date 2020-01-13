@@ -49,7 +49,7 @@ public final class Misc {
      * @param s text
      */
     public static void error(String s) {
-        getInstance().getLogger().log(Level.SEVERE, s);
+        getInstance().getLogger().log(Level.WARNING, s);
     }
 
     /**
@@ -139,8 +139,7 @@ public final class Misc {
         return item;
     }
 
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
+    @SuppressWarnings("deprecation")
     public static ItemStack getPlayerSkull(String owner) {
         ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
         if (owner != null) {

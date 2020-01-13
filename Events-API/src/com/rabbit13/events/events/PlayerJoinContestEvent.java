@@ -1,7 +1,7 @@
 package com.rabbit13.events.events;
 
-import com.rabbit13.events.objects.Data;
-import com.rabbit13.events.objects.Event;
+import com.rabbit13.events.objects.PlayerData;
+import com.rabbit13.events.objects.event.Event;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -12,10 +12,10 @@ public abstract class PlayerJoinContestEvent extends org.bukkit.event.Event {
     private static final HandlerList handlers = new HandlerList();
     private String playerName;
     private Event event;
-    private final Data data;
+    private final PlayerData data;
     private boolean canceled;
 
-    public PlayerJoinContestEvent(String playerName, Event event, Data data) {
+    public PlayerJoinContestEvent(String playerName, Event event, PlayerData data) {
         this.playerName = playerName;
         this.event = event;
         this.data = data;
@@ -27,6 +27,7 @@ public abstract class PlayerJoinContestEvent extends org.bukkit.event.Event {
         return handlers;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isCanceled() {
         return canceled;
     }
@@ -39,7 +40,7 @@ public abstract class PlayerJoinContestEvent extends org.bukkit.event.Event {
         return Bukkit.getPlayer(playerName);
     }
 
-    public Data getPlayerData() {
+    public PlayerData getPlayerData() {
         return data;
     }
 

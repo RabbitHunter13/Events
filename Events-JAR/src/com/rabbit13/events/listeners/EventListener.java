@@ -1,11 +1,14 @@
 package com.rabbit13.events.listeners;
 
-import com.rabbit13.events.events.ePlayerDeathAtContestEvent;
+import com.rabbit13.events.events.RabPlayerDeathAtContestEvent;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.PlayerManager;
-import com.rabbit13.events.objects.EventMods;
-import com.rabbit13.events.objects.eEvent;
+import com.rabbit13.events.objects.event.Event;
+import com.rabbit13.events.objects.event.mods.EventMods;
+import com.rabbit13.events.objects.event.tools.RabCheckpointLocation;
+import lombok.val;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,8 +16,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.ItemStack;
 
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -31,41 +34,71 @@ public final class EventListener implements Listener {
      */
     @EventHandler
     public void onInventoryItemPickup(InventoryClickEvent e) {
-        for (Map.Entry<String, eEvent> entry : EventManager.getEvents().entrySet()) {
-            eEvent event = entry.getValue();
-            if (e.getWhoClicked().getOpenInventory().getTopInventory().equals(event.getInventory())) {
-                event.modificator = e.getSlot();
-                ItemStack item = event.getInventory().getItem(e.getSlot());
-                if (item != null) {
+        for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
+            Event event = entry.getValue();
+            EventMods mods = event.getMods();
+            //<editor-fold desc="Events">
+            if (e.getWhoClicked().getOpenInventory().getTopInventory() == event.getInventory()) {
+                if (e.getClickedInventory() == event.getInventory()) {
                     if (e.getSlot() == 0 || e.getSlot() == 1) {
                         debugMessage("editing string values");
-                        PlayerManager.getModifyingEvent().put((Player) e.getWhoClicked(), event);
+                        PlayerManager.getModifyingEvent().put((Player) e.getWhoClicked(), new AbstractMap.SimpleEntry<>(e.getSlot(), event));
                         e.getWhoClicked().closeInventory();
                         sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-modification-init"))
-                                       .replace("%value%", (e.getSlot() == 0) ? "Name" : "Owner")
-                                , true, e.getWhoClicked());
+                                       .replace("%value%", (e.getSlot() == 0) ? "Name" : "Owner"),
+                               true,
+                               e.getWhoClicked());
                     }
                     else {
                         debugMessage("editing someting else than string values, no chat listener needed");
-                        event.updateItems(event.modificator, (Player) e.getWhoClicked());
+                        event.updateItems(e.getSlot(), (Player) e.getWhoClicked());
+                    }
+                    debugMessage("Clicked slot: " + e.getSlot());
+                    debugMessage("Clicked type: " + e.getAction().toString());
+                    e.setCancelled(true);
+                }
+                break;
+            }
+            //</editor-fold>
+            //<editor-fold desc="Mods">
+            if (e.getWhoClicked().getOpenInventory().getTopInventory() == event.getMods().getInventory()) {
+                if (e.getClickedInventory() == event.getMods().getInventory()) {
+                    //Mods inventory
+                    mods.updateItems(e.getSlot(), (Player) e.getWhoClicked(), e.getAction());
+                    debugMessage("Clicked slot: " + e.getSlot());
+                    debugMessage("Clicked type: " + e.getAction().toString());
+                    e.setCancelled(true);
+                }
+                break;
+            }
+            //</editor-fold>
+            //<editor-fold desc="Starting Items">
+            if (e.getWhoClicked().getOpenInventory().getTopInventory() == event.getMods().getStartingItems().getInventory()) {
+                if (e.getClickedInventory() == event.getMods().getStartingItems().getInventory()) {
+                    if (e.getSlot() == 35) {
+                        e.setCancelled(true);
+                        e.getWhoClicked().openInventory(event.getInventory());
                     }
                 }
-                debugMessage("Clicked item: " + ((item != null) ? item.getType().toString() : "Null"));
-                e.setCancelled(true);
                 break;
-
             }
-            else if (e.getWhoClicked().getOpenInventory().getTopInventory().equals(event.getMods().getInventory())) {
-                //Mods inventory
-                EventMods mods = event.getMods();
-                ItemStack item = mods.getInventory().getItem(e.getSlot());
-                if (item != null) {
-                    mods.updateItems(e.getSlot(), (Player) e.getWhoClicked());
+            //</editor-fold>
+            //<editor-fold desc="Effect Settings">
+            if (e.getWhoClicked().getOpenInventory().getTopInventory() == event.getMods().getEffectSettings().getInventory()) {
+                if (e.getClickedInventory() == event.getMods().getEffectSettings().getInventory()) {
+                    if (e.getSlot() == 35) {
+                        e.setCancelled(true);
+                        e.getWhoClicked().openInventory(event.getInventory());
+                    }
                 }
-                debugMessage("Clicked item: " + ((item != null) ? item.getType().toString() : "Null"));
-                e.setCancelled(true);
+                if (e.getCurrentItem() != null) {
+                    if (!e.getCurrentItem().getType().equals(Material.POTION)) {
+                        e.setCancelled(true);
+                    }
+                }
                 break;
             }
+            //</editor-fold>
         }
     }
 
@@ -113,15 +146,16 @@ public final class EventListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void chooseValueChatEvent(AsyncPlayerChatEvent e) {
         if (PlayerManager.getModifyingEvent().containsKey(e.getPlayer())) {
-            eEvent event = PlayerManager.getModifyingEvent().remove(e.getPlayer());
+            val entry = PlayerManager.getModifyingEvent().remove(e.getPlayer());
             e.setCancelled(true);
-            if (event.modificator == 0) {
-                EventManager.getEvents().remove(event.getName());
-                event.updateItems(event.modificator, e.getMessage(), e.getPlayer());
-                EventManager.getEvents().put(event.getName(), event);
+            String name = e.getMessage().replace(" ", "_");
+            if (entry.getKey() == 0) {
+                EventManager.getEvents().remove(entry.getValue().getName());
+                entry.getValue().updateItems(entry.getKey(), name, e.getPlayer());
+                EventManager.getEvents().put(entry.getValue().getName(), entry.getValue());
             }
             else {
-                event.updateItems(event.modificator, e.getMessage(), e.getPlayer());
+                entry.getValue().updateItems(entry.getKey(), name, e.getPlayer());
             }
         }
     }
@@ -132,7 +166,7 @@ public final class EventListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getEntity())) {
-            ePlayerDeathAtContestEvent event = new ePlayerDeathAtContestEvent(e.getEntity().getName(), EventManager.getActiveEvent());
+            RabPlayerDeathAtContestEvent event = new RabPlayerDeathAtContestEvent(e.getEntity().getName(), EventManager.getActiveEvent());
             Bukkit.getPluginManager().callEvent(event);
         }
     }
@@ -144,10 +178,10 @@ public final class EventListener implements Listener {
     public void onRespawn(PlayerRespawnEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
             if (PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
-                e.setRespawnLocation(PlayerManager.getCheckpointed().get(e.getPlayer()));
+                e.setRespawnLocation(PlayerManager.getCheckpointed().get(e.getPlayer()).getSavedLocation());
             }
             else {
-                e.setRespawnLocation(EventManager.getActiveEvent().getTeleport());
+                e.setRespawnLocation(EventManager.getActiveEvent().getTeleport().getLocation());
             }
         }
     }
@@ -155,10 +189,20 @@ public final class EventListener implements Listener {
     @EventHandler
     public void onMovement(PlayerMoveEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
-            if (EventManager.getActiveEvent().getCheckpoints().contains(Objects.requireNonNull(e.getTo()).getBlock().getLocation())) {
-                if (!PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
-                    PlayerManager.getCheckpointed().put(e.getPlayer(), e.getTo());
-                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-reached"), true, e.getPlayer());
+            assert e.getTo() != null;
+            if (EventManager.getActiveEvent().getCheckpoints().contains(e.getTo().getBlock().getLocation())) {
+                if (EventManager.getActiveEvent().getMods().isActiveCheckpointsEnabled()) {
+                    if (PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
+                        if (!PlayerManager.getCheckpointed().get(e.getPlayer()).getCheckpointLocation().equals(e.getTo().getBlock().getLocation())) {
+                            PlayerManager.getCheckpointed().get(e.getPlayer()).setCheckpointLocation(e.getTo().getBlock().getLocation());
+                            PlayerManager.getCheckpointed().get(e.getPlayer()).setSavedLocation(e.getTo());
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-reached"), true, e.getPlayer());
+                        }
+                    }
+                    else {
+                        PlayerManager.getCheckpointed().put(e.getPlayer(), new RabCheckpointLocation(e.getTo().getBlock().getLocation(), e.getTo()));
+                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-reached"), true, e.getPlayer());
+                    }
                 }
             }
         }

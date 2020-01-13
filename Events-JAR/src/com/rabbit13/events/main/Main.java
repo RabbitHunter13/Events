@@ -5,6 +5,7 @@ import com.rabbit13.events.commands.tablisteners.EventTabCompleter;
 import com.rabbit13.events.listeners.EventListener;
 import com.rabbit13.events.listeners.ModListener;
 import com.rabbit13.events.managers.FileManager;
+import com.rabbit13.events.managers.PlayerManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -53,6 +54,8 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
+
+        PlayerManager.getJoinedEvent().forEach(PlayerManager::playerLeavingEvent);
         filMan.saveEvents();
         filMan.saveCounter();
         super.onDisable();
