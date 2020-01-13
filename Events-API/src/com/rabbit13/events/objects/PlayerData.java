@@ -6,7 +6,7 @@ import org.bukkit.potion.PotionEffect;
 
 import java.util.Collection;
 
-public interface Data {
+public interface PlayerData {
 
     @Override
     String toString();
@@ -19,9 +19,17 @@ public interface Data {
 
     ItemStack getBoots();
 
+    ItemStack getOffHand();
+
     ItemStack[] getItems();
 
     Collection<PotionEffect> getEffects();
+
+    double getMaxHP();
+
+    float getExp();
+
+    int getLevel();
 
     Location getLocation();
 }

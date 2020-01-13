@@ -12,17 +12,20 @@ cze:
   event-already-unlocked: "&6Event je jiz otevreny."
   event-not-owner: "&cTento event neni tvuj, tudiz ho nemuzes upravovat."
   event-not-found: "&cTento event nebyl nalezen."
-  event-modification-finished: "&aUpravil jsi key %key% na hodnotu &f%value%"
   event-modification-init: "&eNapis novou hodnotu %value% do chatu:"
+  event-modification-number-error: "&cVepsana hodnota neni cislo! Napis hodnotu prosim znovu."
+  event-modification-finished: "&aUpravil jsi key %key% na hodnotu &f%value%"
   event-list-official: "&eSeznam official eventu:"
   event-list-other: "&eSeznam ostatnich eventu:"
 
   checkpoint-reached: "&aCheckpoint reached!"
-  checkpoint-added: "&aPridal jsi checkpojnt %location%"
-  checkpoint-removed: "&6Smazal jsi checkpoint %location%"
+  checkpoint-added: "&aPridal jsi checkpoint &5%location%"
+  checkpoint-removed: "&6Smazal jsi checkpoint &5%location%"
   checkpoint-removed-all: "&6Smazal jsi vsechny checkpointy"
   checkpoint-not-found: "&cNa tvem miste nebyl nalezen zadny checkpoint"
   checkpoint-show: "&ePrave vidis vsechny checkpointy (sklo)"
+  checkpoint-list: "&eSeznam checkpointu v eventu &6%event%:"
+  checkpoints-not-active: "&6Na tomto eventu nejsou aktivni checkpointy"
 
   banned-player-not-found: "&cTento hrac nebyl na eventu %event% zabanovan"
   player-banned-admin-side: "&6Hrac %player% byl trvale vyloucen z eventu %event%."
@@ -53,59 +56,6 @@ cze:
   teleport-success: "&6Byl jsi teleportovan na event &e%event%."
   teleport-banned: "&cNemuzes se pripojit na tento event, protoze jsi byl zabanovan z ucastneni se na tomto eventu."
 
-  active-event-not-found: "&6nebyl nalezen zadny aktivni event."
-  event-locked: "&cNa event se jiz nemuzes pripojit."
-  event-leave: "&eOpustil jsi event."
-  event-fail: "&eBohuzel jsi selhal. Preji vice stesti priste :)"
-  event-end: "&eEvent skoncil."
-
-eng:
-  #note - variables are defined just as comments say (so in "no variable" block you cant use %event% etc.)
-
-  ##########Administration messages##########
-  # %event% - event name
-  event-created: "&eCreated event %event%."
-  event-deleted: "&eDeleted event %event%"
-  event-started: "&eEvent &f%event% &estarted!"
-  banned-player-not-found: "&cThis player wasn't banned at %event%"
-  # %key% and %value% - key = modification like teleport, owner | value = value of modification like [x: 500, y: 45, z: 450] (teleport), Teleriann (owner)
-  event-modification-finished: "&aEdited %key% to value &f%value%"
-  # %value% - value of key of chosen event
-  event-modification-init: "&eWrite new value for %value% in chat:"
-  # %event% - event name, %player% - player name
-  player-banned-admin-side: "&6Player %player% was banned from participating on event %event%."
-  player-kicked-admin-side: "&6Player %player% was kicked from event %event%."
-  # %player%layer name
-  player-add-win: "&eWin added to player &f%player%"
-  # %world% - event-name in config.yml
-  world-not-found: "World %world% hasn't been found."
-  #no variable
-  event-list-official: "&eList of official events:"
-  event-list-other: "&eSeznam ostatnich eventu:"
-  win-counter-list: "&eTop 10 Vyhercu eventu:"
-  event-lock: "&eEvent zavren"
-  event-unlock: "&eEvent otevren"
-  event-already-locked: "&6Event je jiz zamkly."
-  event-already-unlocked: "&6Event je jiz otevreny."
-  event-not-owner: "&cTento event neni tvuj, tudiz ho nemuzes upravovat."
-  event-not-found: "&cTento event nebyl nalezen."
-  player-not-found: "&6Tento hrac neni online, nebo neexistuje."
-  player-not-found-at-event: "&6Tento hrac neni na eventu."
-  player-is-admin: "&cAdminy nemuzes vyhodit ani zabanovat z eventu."
-  config-reloaded: "&eYaml konfigurace byla obnovena"
-  ##Newly loaded, needs sorting
-
-  ##########Player Notification messages#########
-  # %event% - event name
-  player-banned-player-side: "&cByl jsi vyloucen z budouciho ucastneni se na eventu &4%event%."
-  teleport-success: "&6Byl jsi teleportovan na event &e%event%."
-  #no variable
-  inventory-cleared: "&eInventare vseh hracu na eventu byli smazany"
-  no-permission: "&cNa toto nemas opravneni!"
-  no-permission-commands: "&cNa eventu nemuzes pouzivat prikazy! Pro odchod pouzij prikaz &6/e quit"
-  player-kicked-player-side: "&6Byl jsi vyhozen z eventu."
-  player-not-at-event: "&cTento prikaz nemuzes pouzit pokud nejsi na eventu."
-  teleport-banned: "&cNemuzes se pripojit na tento event, protoze jsi byl zabanovan z ucastneni se na tomto eventu."
   active-event-not-found: "&6nebyl nalezen zadny aktivni event."
   event-locked: "&cNa event se jiz nemuzes pripojit."
   event-leave: "&eOpustil jsi event."

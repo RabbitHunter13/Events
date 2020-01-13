@@ -1,5 +1,6 @@
 package com.rabbit13.events.main;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -48,7 +49,7 @@ public final class Misc {
      * @param s text
      */
     public static void error(String s) {
-        getInstance().getLogger().log(Level.SEVERE, s);
+        getInstance().getLogger().log(Level.WARNING, s);
     }
 
     /**
@@ -82,8 +83,8 @@ public final class Misc {
      * @param lore     Lores of an ItemStack
      * @return Custom-made ItemStack
      */
-    public static ItemStack getSpecifiedItem(@NotNull Material material, int amount, short dmg, @Nullable String name, @Nullable String... lore) {
-        ItemStack item = new ItemStack(material, (amount <= 0) ? 1 : amount, dmg);
+    public static ItemStack getSpecifiedItem(@NotNull Material material, int amount, @Nullable String name, @Nullable String... lore) {
+        ItemStack item = new ItemStack(material, (amount <= 0) ? 1 : amount);
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
             if (name != null)
@@ -138,14 +139,13 @@ public final class Misc {
         return item;
     }
 
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
+    @SuppressWarnings("deprecation")
     public static ItemStack getPlayerSkull(String owner) {
-        ItemStack item = new ItemStack(Material.SKULL_ITEM, 1, (short) 3);
+        ItemStack item = new ItemStack(Material.PLAYER_HEAD, 1);
         if (owner != null) {
             if (item.getItemMeta() != null) {
                 SkullMeta meta = (SkullMeta) item.getItemMeta();
-                meta.setOwner(owner);
+                meta.setOwningPlayer(Bukkit.getOfflinePlayer(owner));
                 meta.setDisplayName(owner);
                 item.setItemMeta(meta);
             }

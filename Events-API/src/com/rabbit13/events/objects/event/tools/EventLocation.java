@@ -1,4 +1,4 @@
-package com.rabbit13.events.objects;
+package com.rabbit13.events.objects.event.tools;
 
 
 import org.bukkit.Location;

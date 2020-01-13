@@ -1,5 +1,7 @@
-package com.rabbit13.events.objects;
+package com.rabbit13.events.objects.event;
 
+import com.rabbit13.events.objects.event.mods.EventMods;
+import com.rabbit13.events.objects.event.tools.EventLocation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -13,7 +15,6 @@ public interface Event extends InventoryHolder {
     @NotNull
     @Override
     Inventory getInventory();
-
 
     /**
      * Set and update values of event thru ChatListener
@@ -38,13 +39,14 @@ public interface Event extends InventoryHolder {
 
     EventLocation getTeleport();
 
-    boolean isLocked();
+    boolean isLockedTeleport();
 
-    void setLocked(boolean locked);
+    void setLockedTeleport(boolean locked);
 
     EventMods getMods();
 
     List<Location> getCheckpoints();
 
     List<String> getBanned();
+
 }

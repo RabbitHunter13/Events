@@ -1,9 +1,9 @@
 package com.rabbit13.events.commands.tablisteners;
 
 import com.rabbit13.events.main.Main;
+import com.rabbit13.events.managers.BackupItemsManager;
 import com.rabbit13.events.managers.EventManager;
-import com.rabbit13.events.objects.eEvent;
-import org.bukkit.Bukkit;
+import com.rabbit13.events.objects.event.Event;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -13,70 +13,90 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static com.rabbit13.events.main.Misc.debugMessage;
-
 public class EventTabCompleter implements TabCompleter {
-    private int argsLength = 0;
-    private static String[] subCommands = new String[]{
-            "info", "help", "list",
-            "reload", "quit", "lock",
-            "unlock", "tp", "modify",
-            "end", "invclear", "debug",
-            "create", "remove", "start",
+    private static final String[] subCommands = new String[]{
+            "info", "help", "list", "reload", "debug",
+            "backup", "tp", "modify", "broadcast", "win",
+            "start", "quit", "end", "invclear",
+            "create", "remove", "lock", "unlock",
             "kick", "ban", "unban", "checkpoint",
-            "broadcast", "win", "backup"
     };
-    private static String[] winCommands = new String[]{
+    private static final String[] winCommands = new String[]{
             "list", "add"
     };
-
-    private static String[] checkpointCommands = new String[]{
-            "set", "remove", "removeall", "view"
+    private static final String[] checkpointCommands = new String[]{
+            "set", "remove", "removeall", "view", "list"
     };
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
+    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender,
+                                                @NotNull Command command,
+                                                @NotNull String alias,
+                                                @NotNull String[] args) {
         List<String> results = new ArrayList<>();
         if (args.length == 1) {
             Collections.addAll(results, subCommands);
         }
-        else if (args.length == 2) {
+        else {
             if (args[0].equalsIgnoreCase("backup")) {
-                List<String> names = new ArrayList<>();
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    names.add(player.getName());
+                if (args.length == 2) {
+                    String[] files = BackupItemsManager.getPath().list();
+                    if (files != null) {
+                        for (String fileName : files) {
+                            results.add(fileName.replace(".yml", ""));
+                        }
+                    }
                 }
-                results.addAll(names);
             }
             else if (args[0].equalsIgnoreCase("win")) {
-                results.addAll(Arrays.asList(winCommands));
-            }
-            else if (args[0].equalsIgnoreCase("checkpoint")) {
-                results.addAll(Arrays.asList(checkpointCommands));
-            }
-            else {
-                for (Map.Entry<String, eEvent> entries : EventManager.getEvents().entrySet()) {
-                    results.add(entries.getKey());
+                if (args.length == 2) {
+                    results.addAll(Arrays.asList(winCommands));
+                }
+                else if (args.length == 3) {
+                    if (args[1].equalsIgnoreCase("add")) {
+                        for (Player p : Main.getInstance().getServer().getOnlinePlayers()) {
+                            results.add(p.getName());
+                        }
+                    }
                 }
             }
-        }
-        else if (args.length == 3) {
-            if (args[0].equalsIgnoreCase("win")) {
-                if (args[1].equalsIgnoreCase("add")) {
+            else if (args[0].equalsIgnoreCase("checkpoint") || args[0].equalsIgnoreCase("ch")) {
+                if (args.length == 2) {
+                    results.addAll(Arrays.asList(checkpointCommands));
+                }
+                else if (args.length == 3) {
+                    for (Map.Entry<String, Event> entries : EventManager.getEvents().entrySet()) {
+                        results.add(entries.getKey());
+                    }
+                }
+            }
+            else if (args[0].equalsIgnoreCase("kick")) {
+                if (args.length == 2) {
                     for (Player p : Main.getInstance().getServer().getOnlinePlayers()) {
-                        debugMessage("Player:" + p.toString());
                         results.add(p.getName());
                     }
                 }
             }
-        }
-        if(argsLength != args.length) {
-            argsLength = args.length;
-            debugMessage("args: " + Arrays.toString(args));
+            else if (args[0].equalsIgnoreCase("ban")) {
+                if (args.length == 2) {
+                    for (Player p : Main.getInstance().getServer().getOnlinePlayers()) {
+                        results.add(p.getName());
+                    }
+                }
+            }
+            else {
+                if (args.length == 2) {
+                    for (Map.Entry<String, Event> entries : EventManager.getEvents().entrySet()) {
+                        results.add(entries.getKey());
+                    }
+                }
+            }
         }
         return searchAlgoritm(args, results);
     }
 
+
+    //<editor-fold desc="Other Methods">
     @NotNull
     private <Col extends Collection<String>> List<String> searchAlgoritm(@NotNull String[] args, Col keys) {
         List<String> results = new ArrayList<>();
@@ -107,8 +127,5 @@ public class EventTabCompleter implements TabCompleter {
         }
         return results;
     }
-
-    public static String[] getSubCommands() {
-        return subCommands;
-    }
+    //</editor-fold>
 }

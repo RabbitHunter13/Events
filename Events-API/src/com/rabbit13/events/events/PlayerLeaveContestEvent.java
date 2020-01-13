@@ -1,7 +1,7 @@
 package com.rabbit13.events.events;
 
 
-import com.rabbit13.events.objects.Event;
+import com.rabbit13.events.objects.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 
