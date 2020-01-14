@@ -686,7 +686,10 @@ public final class EventExecutor implements CommandExecutor {
                                     }
                                     else if (args[1].equalsIgnoreCase("remove")) {
                                         if (EventManager.getActiveEvent().getCheckpoints().remove(plsender.getLocation().getBlock().getLocation()))
-                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed"), true, plsender);
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-removed"))
+                                                    .replace("%location%", ("[X: " + plsender.getLocation().getBlockX() +
+                                                            "Y: " + plsender.getLocation().getBlockY() +
+                                                            "Z: " + plsender.getLocation().getBlockZ() + "]")), true, plsender);
                                         else
                                             sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-not-found"), true, plsender);
                                     }

@@ -1,6 +1,4 @@
 cze:
-  #note - variables are defined just as comments say (so in "no variable" block you cant use %event% etc.)
-
   ##########Administration messages##########
   event-created: "&eVytvoril jsi event %event%."
   event-deleted: "&eSmazal jsi event %event%"
@@ -23,7 +21,7 @@ cze:
   checkpoint-removed: "&6Smazal jsi checkpoint &5%location%"
   checkpoint-removed-all: "&6Smazal jsi vsechny checkpointy"
   checkpoint-not-found: "&cNa tvem miste nebyl nalezen zadny checkpoint"
-  checkpoint-show: "&ePrave vidis vsechny checkpointy (sklo)"
+  checkpoint-show: "&ePrave vidis vsechny checkpointy (zelena vlna)"
   checkpoint-list: "&eSeznam checkpointu v eventu &6%event%:"
   checkpoints-not-active: "&6Na tomto eventu nejsou aktivni checkpointy"
 
@@ -61,3 +59,63 @@ cze:
   event-leave: "&eOpustil jsi event."
   event-fail: "&eBohuzel jsi selhal. Preji vice stesti priste :)"
   event-end: "&eEvent skoncil."
+eng:
+  ##########Administration messages##########
+  event-created: "&eCreated event %event%."
+  event-deleted: "&eDeleted event %event%"
+  event-started: "&eEvent &f%event% &ehas been enabled!"
+  event-already-started: "&cSome event is active."
+  event-lock: "&eEvent locked"
+  event-unlock: "&eEvent opened"
+  event-already-locked: "&6Event already locked."
+  event-already-unlocked: "&6Event already opened."
+  event-not-owner: "&cThis event is not yours, so you cant edit is.."
+  event-not-found: "&cThis event was not found."
+  event-modification-init: "&eWrite new value %value% to chat:"
+  event-modification-number-error: "&cThis is not number! Player write a number."
+  event-modification-finished: "&aKey %key% edited to value &f%value%"
+  event-list-official: "&eList of official events:"
+  event-list-other: "&eList of other events:"
+
+  checkpoint-reached: "&aCheckpoint reached!"
+  checkpoint-added: "&aCheckpoint added! &5%location%"
+  checkpoint-removed: "&6Checkpoint deleted! &5%location%"
+  checkpoint-removed-all: "&6deleted all checkpoints in this event."
+  checkpoint-not-found: "&cThere is not any checkpoint at your position"
+  checkpoint-show: "&eNow you see all checkpoints (green wool)"
+  checkpoint-list: "&eList of all checkpoints at event &6%event%:"
+
+  banned-player-not-found: "&cThis player was not banned at event %event%"
+  player-banned-admin-side: "&6Player %player% was banned at event %event%."
+  player-kicked-admin-side: "&6Player %player% was kicked from event ."
+  player-not-found: "&6Player not found."
+  player-not-found-at-event: "&6This player in not at event."
+  player-is-admin: "&cAdmins cannot be banned or kicked from event."
+
+  win-counter-add: "&eWin cound raised for player &f%player%"
+  win-counter-show: "&eYour win count: %wins%"
+  win-counter-list: "&eTop 10 winners:"
+
+  world-not-found: "World %world% was not found."
+
+  backup-not-found: "&6Backup was not found"
+  inventory-cleared: "&eAll players at event inventories were cleared."
+  not-same-world-as-event: "&cYou have to be in the same world as event if you want to show checkpoints."
+  config-reloaded: "&eYamls reloaded"
+
+  ##########Player Notification messages#########
+  no-permission: "&cYou do not have permission!"
+  no-permission-commands: "&cYou cant use commands et the event! use &6/e quit &cto quit the event."
+
+  player-banned-player-side: "&cYou have been banned from event &4%event%."
+  player-kicked-player-side: "&6You have been kicked from event."
+  player-not-at-event: "&cYou cant use this command if you are not at the event."
+
+  teleport-success: "&6You have been teleported to event &e%event%."
+  teleport-banned: "&cYou cannot join this, because you have been banned from this event."
+
+  active-event-not-found: "&6No event is active."
+  event-locked: "&cEvent locked."
+  event-leave: "&eLeaving event."
+  event-fail: "&eYou failed. &aBetter luck next time :)"
+  event-end: "&eEvent Ended."
