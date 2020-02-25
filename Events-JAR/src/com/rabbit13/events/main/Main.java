@@ -1,13 +1,15 @@
 package com.rabbit13.events.main;
 
 import com.rabbit13.events.commands.EventExecutor;
-import com.rabbit13.events.commands.tablisteners.EventTabCompleter;
+import com.rabbit13.events.commands.tabcompleters.EventTabCompleter;
+import com.rabbit13.events.listeners.BackupListener;
 import com.rabbit13.events.listeners.EventListener;
 import com.rabbit13.events.listeners.ModListener;
+import com.rabbit13.events.managers.BackupManager;
 import com.rabbit13.events.managers.FileManager;
 import com.rabbit13.events.managers.PlayerManager;
+import lombok.val;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -19,7 +21,9 @@ public final class Main extends JavaPlugin {
     private static boolean debugMode;
     private static Main instance;
     //files
+
     private static FileManager filMan;
+    private static BackupManager bacMan;
     private static PluginDescriptionFile pdf;
     //values
     private static CommandSender sender;
@@ -42,11 +46,13 @@ public final class Main extends JavaPlugin {
         filMan.loadEvents();
         filMan.loadCounter();
         saveDefaultConfig();
+        bacMan = new BackupManager();
         sendLM(pluginPrefix + " Setting up Listeners", false, sender); //Events
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         getServer().getPluginManager().registerEvents(new ModListener(), this);
+        getServer().getPluginManager().registerEvents(new BackupListener(), this);
         sendLM(pluginPrefix + " Setting up Executors", false, sender); //Executors
-        PluginCommand eCommand = Objects.requireNonNull(this.getCommand("event"));
+        val eCommand = Objects.requireNonNull(this.getCommand("event"));
         eCommand.setExecutor(new EventExecutor());
         eCommand.setTabCompleter(new EventTabCompleter());
         super.onEnable();
@@ -54,14 +60,14 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-
-        PlayerManager.getJoinedEvent().forEach(PlayerManager::playerLeavingEvent);
+        PlayerManager.getJoinedEvent().forEach((p,d) -> PlayerManager.playerLeavingEvent(p,null,true));
         filMan.saveEvents();
         filMan.saveCounter();
         super.onDisable();
     }
 
-    static boolean isDebugMode() {
+    //<editor-fold desc="Getters">
+    public static boolean isDebugMode() {
         return debugMode;
     }
 
@@ -71,6 +77,10 @@ public final class Main extends JavaPlugin {
 
     public static FileManager getFilMan() {
         return filMan;
+    }
+
+    public static BackupManager getBacMan() {
+        return bacMan;
     }
 
     public static PluginDescriptionFile getPdf() {
@@ -88,5 +98,5 @@ public final class Main extends JavaPlugin {
     public static String getPluginPrefix() {
         return pluginPrefix;
     }
-
+    //</editor-fold>
 }
