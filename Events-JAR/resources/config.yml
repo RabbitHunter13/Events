@@ -1,0 +1,31 @@
+#
+# template by Rabbit_Hunter13
+# Originally Created for CzechSurvival
+#
+
+#Debug-mode, it will text in console every move in plugin
+debug: false
+lang: "cze"
+usages:
+  - "===Player==="
+  - "&e/e &f- &6Join an active event"
+  - "&e/e quit &f- &6Leave an active event"
+usages-admin:
+  - "===Admin==="
+  - "&e/e list - List of all created events"
+  - "&e/e create <event> &f- &6Create a new event with teleport where you were standing"
+  - "&e/e remove <event> &f- &6Delete an event"
+  - "&e/e activate <event> &f- &6Activate an event (people can type /e for join)"
+  - "&e/e end &f- &6Ends an event and teleport all joined players to their last position"
+  - "&e/e modify <event> &f- &6Open a gui of event settings"
+  - "&e/e [b]roadcast <text> &f- &6Broadcast a message about active event"
+  - "&e/e kick <player> &f- &6Kick a player from active event"
+  - "&e/e ban <player> &f- &6Ban a player from active event"
+  - "&e/e unban <player> <event> &f- &6Unban a player on defined event"
+  - "&e/e invclear &f- &6Clear inventory of all joined players"
+#in console prefix
+plugin-prefix: '[Events]'
+#in game prefix
+prefix: '&4[&cEvents&4]&f'
+#world where events are
+event-world: "Event"

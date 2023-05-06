@@ -7,13 +7,14 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="Events-JAR" />
-        <module name="Events-API" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="Events" target="1.6" />
       <module name="Events (2)" target="1.8" />
       <module name="Events (3)" target="1.5" />
+      <module name="Events-API" target="1.8" />
+      <module name="Events-JAR" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
