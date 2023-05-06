@@ -1,14 +1,16 @@
 package com.rabbit13.events.managers;
 
 import com.rabbit13.events.objects.event.Event;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class EventManager {
     private static Event activeEvent;
-    private static Map<String, Event> events = new HashMap<>();
+    private static final Map<String, Event> events = new HashMap<>();
 
+    @Nullable
     public static Event getActiveEvent() {
         return activeEvent;
     }

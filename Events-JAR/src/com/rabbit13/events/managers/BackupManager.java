@@ -20,8 +20,7 @@ public class BackupManager {
     @Getter private static final File path = new File(getInstance().getDataFolder().getPath() +
                                                               File.separator + "data" +
                                                               File.separator + "inventory_backups");
-    @Getter private static Map<String, Backup> backups = new HashMap<>();
-
+    @Getter private static final Map<String, Backup> backups = new HashMap<>();
 
     public BackupManager() {
         if (!path.exists()) {

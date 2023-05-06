@@ -13,6 +13,14 @@
     <packaging>jar</packaging>
     <build>
         <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>resources</directory>
+            </resource>
+            <resource>
+                <directory>data</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -27,14 +35,6 @@
                 <version>3.1.2</version>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>resources</directory>
-            </resource>
-            <resource>
-                <directory>data</directory>
-            </resource>
-        </resources>
     </build>
     <dependencies>
         <dependency>

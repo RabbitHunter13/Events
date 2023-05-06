@@ -20,17 +20,19 @@ public interface EventMods extends InventoryHolder {
 
     Inventory getModsHolder();
 
-    Checkpoints getCheckpoints();
+    CheckpointsMod getCheckpointsMod();
 
-    Effects getEffects();
+    EffectsMod getEffectsMod();
 
-    FallDamage getFallDamage();
+    FallDamageMod getFallDamageMod();
 
-    LavaEqualFail getLavaEqualFail();
+    LavaEqualFailMod getLavaEqualFailMod();
 
-    MoreHP getMoreHP();
+    MoreHPMod getMoreHPMod();
 
-    RewardItems getRewards();
+    RewardItemsMod getRewardItemsMod();
 
-    StartingItems getStartingItems();
+    StartingItemsMod getStartingItemsMod();
+
+    NoSwimMod getNoSwimMod();
 }

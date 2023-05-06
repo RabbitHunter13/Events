@@ -42,6 +42,10 @@ public final class Misc {
         }
     }
 
+    public static String textIntoColor(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
     /**
      * Sends error message to console
      *

@@ -1,6 +1,6 @@
 package com.rabbit13.events.objects.event.mods;
 
-public interface MoreHP extends Mod {
+public interface MoreHPMod extends Mod {
 
     double getHealth();
 

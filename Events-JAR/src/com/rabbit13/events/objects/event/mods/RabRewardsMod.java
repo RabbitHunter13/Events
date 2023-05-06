@@ -25,7 +25,7 @@ import static com.rabbit13.events.main.Main.getFilMan;
 import static com.rabbit13.events.main.Main.getPrefix;
 import static com.rabbit13.events.main.Misc.*;
 
-public final class RabRewardsMod extends RabMod implements RewardItems, Listener {
+public final class RabRewardsMod extends RabMod implements RewardItemsMod, Listener {
     @Getter
     private Inventory rewards;
     @Getter
@@ -41,7 +41,6 @@ public final class RabRewardsMod extends RabMod implements RewardItems, Listener
         initialize();
         Bukkit.getServer().getPluginManager().registerEvents(this, Main.getInstance());
     }
-
 
     public RabRewardsMod(EventMods mods, int maxWins, ItemStack[] items, boolean active) {
         super(mods);
@@ -62,7 +61,7 @@ public final class RabRewardsMod extends RabMod implements RewardItems, Listener
         getInventory().setItem(2, getSpecifiedItem(Material.BOOK, 1, "Max wins",
                                                    "&eClick to change max winners",
                                                    "&eMax winners: &6" + maxWins));
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 8; i++) {
             rewards.setItem(i, getSpecifiedItem(Material.YELLOW_STAINED_GLASS_PANE, 1, "&6" + (i + 1) + ". Misto"));
         }
         rewards.setItem(44, getSpecifiedItem(Material.ARROW, 1, "&cBack"));
@@ -71,7 +70,7 @@ public final class RabRewardsMod extends RabMod implements RewardItems, Listener
     public List<ItemStack> getRewardRow(int row) {
         List<ItemStack> items = new ArrayList<>();
         debugMessage("getRewardRow row: " + row);
-        if (row >= 0 && row <= 8) {
+        if (row >= 0 && row < 8) {
             for (int i = 9 + row; i < 45; i += 9) {
                 ItemStack item = rewards.getItem(i);
 

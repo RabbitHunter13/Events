@@ -4,7 +4,7 @@ import com.rabbit13.events.main.Main;
 import com.rabbit13.events.objects.event.EventMods;
 import org.bukkit.Bukkit;
 
-public final class RabCheckpointsMod extends RabMod implements Checkpoints {
+public final class RabCheckpointsMod extends RabMod implements CheckpointsMod {
 
     public RabCheckpointsMod(EventMods mods) {
         super(mods);

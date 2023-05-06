@@ -4,18 +4,16 @@ import com.rabbit13.events.main.Main;
 import com.rabbit13.events.objects.event.EventMods;
 import org.bukkit.Bukkit;
 
-public final class RabNoFallDamageMod extends RabMod implements FallDamageMod {
+public class RabNoSwimMod extends RabMod implements NoSwimMod {
 
-    public RabNoFallDamageMod(EventMods mods) {
+    public RabNoSwimMod(EventMods mods) {
         super(mods);
-        setEnabled(true);
         Bukkit.getServer().getPluginManager().registerEvents(this, Main.getInstance());
     }
 
-    public RabNoFallDamageMod(EventMods mods, boolean active) {
+    public RabNoSwimMod(EventMods mods, boolean enabled) {
         super(mods);
-        setEnabled(active);
+        setEnabled(enabled);
         Bukkit.getServer().getPluginManager().registerEvents(this, Main.getInstance());
     }
-
 }

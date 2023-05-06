@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 public abstract class PlayerDeathAtContestEvent extends org.bukkit.event.Event {
     private static final HandlerList handlers = new HandlerList();
-    private String playerName;
-    private Event event;
+    private final String playerName;
+    private final Event event;
 
     public PlayerDeathAtContestEvent(String playerName, Event event) {
         this.playerName = playerName;

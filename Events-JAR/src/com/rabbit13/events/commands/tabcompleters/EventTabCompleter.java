@@ -3,6 +3,7 @@ package com.rabbit13.events.commands.tabcompleters;
 import com.rabbit13.events.main.Main;
 import com.rabbit13.events.managers.BackupManager;
 import com.rabbit13.events.managers.EventManager;
+import com.rabbit13.events.objects.ItemRarity;
 import com.rabbit13.events.objects.event.Event;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -21,7 +22,7 @@ public class EventTabCompleter implements TabCompleter {
             "backup", "give", "clearinv", "addeff", "cleareff", "tp",
             "modify", "broadcast", "win", "start", "quit", "end",
             "create", "remove", "lock", "unlock", "sethealth",
-            "kick", "ban", "unban", "checkpoint",
+            "kick", "ban", "unban", "checkpoint", "generateitem"
     };
 
     @Override
@@ -121,6 +122,17 @@ public class EventTabCompleter implements TabCompleter {
                     }
                     break;
                 }
+                case "generateitem": {
+                    if (args.length == 2) {
+                        for (ItemRarity value : ItemRarity.values()) {
+                            results.add(value.toString());
+                        }
+                    }
+                    else if (args.length == 3) {
+                        results.add("true");
+                        results.add("false");
+                    }
+                }
                 default: {
                     if (args.length == 2) {
                         for (Map.Entry<String, Event> entries : EventManager.getEvents().entrySet()) {
@@ -142,7 +154,7 @@ public class EventTabCompleter implements TabCompleter {
         if (args.length == 1) {
             if (args[0].length() > 0) {
                 for (String subCommand : keys) {
-                    if (subCommand.substring(0, Math.min((args[0].length()), subCommand.length())).equals(args[0])) {
+                    if (subCommand.substring(0, Math.min((args[0].length()), subCommand.length())).equalsIgnoreCase(args[0])) {
                         results.add(subCommand);
                     }
                 }
@@ -155,7 +167,7 @@ public class EventTabCompleter implements TabCompleter {
             int i = args.length - 1;
             if (args[i].length() > 0) {
                 for (String key : keys) {
-                    if (key.substring(0, Math.min((args[i].length()), key.length())).equals(args[i])) {
+                    if (key.substring(0, Math.min((args[i].length()), key.length())).equalsIgnoreCase(args[i])) {
                         results.add(key);
                     }
                 }

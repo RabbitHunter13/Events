@@ -1,11 +1,14 @@
 package com.rabbit13.events.managers;
 
+import com.rabbit13.events.main.Misc;
 import com.rabbit13.events.objects.event.Event;
 import com.rabbit13.events.objects.event.RabEvent;
-import com.rabbit13.events.objects.event.mods.Effects;
-import com.rabbit13.events.objects.event.mods.MoreHP;
-import com.rabbit13.events.objects.event.mods.RewardItems;
-import com.rabbit13.events.objects.event.mods.StartingItems;
+import com.rabbit13.events.objects.event.mods.EffectsMod;
+import com.rabbit13.events.objects.event.mods.MoreHPMod;
+import com.rabbit13.events.objects.event.mods.RewardItemsMod;
+import com.rabbit13.events.objects.event.mods.StartingItemsMod;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -22,12 +25,12 @@ import static com.rabbit13.events.main.Misc.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class FileManager {
-    private final File langFile;
+    @Getter private final File langFile;
 
     private final File eventsFile;
     private final File counterFile;
 
-    private ConfigurationSection words;
+    @Getter @Setter private ConfigurationSection words;
     private final String languagePreset;
 
     public FileManager() {
@@ -41,7 +44,6 @@ public final class FileManager {
         //other
         languagePreset = getInstance().getConfig().getString("lang");
         assert languagePreset != null;
-        words = YamlConfiguration.loadConfiguration(langFile).getConfigurationSection(languagePreset);
         //save files to dataFolder (first time)
         final File readme = new File(path, "readme.txt");
         final File[] files = new File[]{langFile, readme};
@@ -60,7 +62,6 @@ public final class FileManager {
                 }
             }
         }
-
         //different dir
         final File[] files2 = new File[]{eventsFile, counterFile};
         for (File f : files2) {
@@ -75,6 +76,7 @@ public final class FileManager {
                 }
             }
         }
+        words = YamlConfiguration.loadConfiguration(langFile).getConfigurationSection(languagePreset);
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
@@ -137,39 +139,43 @@ public final class FileManager {
             ConfigurationSection mods = eventSection.createSection("mods");
             //<editor-fold desc="Fall Damage">
             ConfigurationSection mod = mods.createSection("fall-damage");
-            mod.set("enabled", event.getMods().getFallDamage().isEnabled());
+            mod.set("enabled", event.getMods().getFallDamageMod().isEnabled());
             //</editor-fold>
             //<editor-fold desc="Lava equals fail">
             mod = mods.createSection("lava-equals-fail");
-            mod.set("enabled", event.getMods().getLavaEqualFail().isEnabled());
+            mod.set("enabled", event.getMods().getLavaEqualFailMod().isEnabled());
             //</editor-fold>
             //<editor-fold desc="Checkpoints">
             mod = mods.createSection("checkpoints");
-            mod.set("enabled", event.getMods().getCheckpoints().isEnabled());
+            mod.set("enabled", event.getMods().getCheckpointsMod().isEnabled());
             //</editor-fold>
             //<editor-fold desc="MoreHP">
             mod = mods.createSection("more-hp");
-            MoreHP moreHP = event.getMods().getMoreHP();
-            mod.set("enabled", moreHP.isEnabled());
-            mod.set("value", moreHP.getHealth());
+            MoreHPMod moreHPMod = event.getMods().getMoreHPMod();
+            mod.set("enabled", moreHPMod.isEnabled());
+            mod.set("value", moreHPMod.getHealth());
             //</editor-fold>
             //<editor-fold desc="Starting Items">
             mod = mods.createSection("starting-items");
-            StartingItems startingItems = event.getMods().getStartingItems();
-            mod.set("enabled", startingItems.isEnabled());
-            mod.set("items", removeNullValues(startingItems.getStartingItems().getContents()));
+            StartingItemsMod startingItemsMod = event.getMods().getStartingItemsMod();
+            mod.set("enabled", startingItemsMod.isEnabled());
+            mod.set("items", removeNullValues(startingItemsMod.getStartingItems().getContents()));
             //</editor-fold>
             //<editor-fold desc="Effects">
             mod = mods.createSection("effects");
-            Effects effects = event.getMods().getEffects();
-            mod.set("enabled", effects.isEnabled());
-            mod.set("items", removeNullValues(effects.getEffectsInv().getContents()));
+            EffectsMod effectsMod = event.getMods().getEffectsMod();
+            mod.set("enabled", effectsMod.isEnabled());
+            mod.set("items", removeNullValues(effectsMod.getEffectsInv().getContents()));
             //</editor-fold>
             //<editor-fold desc="Rewards">
             mod = mods.createSection("rewards");
-            RewardItems rewardItems = event.getMods().getRewards();
-            mod.set("enabled", event.getMods().getRewards().isEnabled());
+            RewardItemsMod rewardItems = event.getMods().getRewardItemsMod();
+            mod.set("enabled", rewardItems.isEnabled());
             mod.set("items", rewardItems.getRewards().getContents());
+            //</editor-fold>
+            //<editor-fold desc="No Swim">
+            mod = mods.createSection("no-swim");
+            mod.set("enabled", event.getMods().getNoSwimMod().isEnabled());
             //</editor-fold>
             //</editor-fold>
         }
@@ -200,55 +206,41 @@ public final class FileManager {
         }
     }
 
-    public File getLangFile() {
-        return langFile;
-    }
-
-    public ConfigurationSection getWords() {
-        return words;
-    }
-
-    public void setWords(ConfigurationSection words) {
-        this.words = words;
-    }
-
     /**
      * Updates lang.yml file if needed
      */
-    public boolean checkWords() {
+    public void checkWords() {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(langFile);
-        ConfigurationSection oldWords = yml.getConfigurationSection(languagePreset);
+        ConfigurationSection externalWords = yml.getConfigurationSection(languagePreset);
 
         InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(getInstance().getResource("lang.yml")));
-        ConfigurationSection newWords = YamlConfiguration.loadConfiguration(reader).getConfigurationSection(languagePreset);
-        assert newWords != null;
+        ConfigurationSection internalWords = YamlConfiguration.loadConfiguration(reader).getConfigurationSection(languagePreset);
+        assert internalWords != null;
+
         boolean changed = false;
-        if (oldWords != null) {
-            for (String key : newWords.getKeys(false)) {
-                if (!oldWords.contains(key)) {
-                    oldWords.set(key, newWords.getString(key));
+        if (externalWords != null) {
+            for (String key : internalWords.getKeys(false)) {
+                if (!externalWords.contains(key)) {
+                    externalWords.set(key, internalWords.getString(key));
                     changed = true;
                 }
             }
         }
         else {
-            oldWords = yml.createSection(languagePreset);
-            for (String key : newWords.getKeys(false)) {
-                if (!oldWords.contains(key)) {
-                    oldWords.set(key, newWords.getString(key));
-                    changed = true;
-                }
+            externalWords = yml.createSection(languagePreset);
+            for (String key : internalWords.getKeys(false)) {
+                externalWords.set(key, internalWords.getString(key));
+                changed = true;
             }
-        }
-        if (changed) {
-            words = oldWords;
         }
         try {
             yml.save(langFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return changed;
+        if (changed) {
+            words = internalWords;
+            Misc.error("Found missing keywords in lang.yml! Saving new ones into file and temporarily using internal ones");
+        }
     }
 }

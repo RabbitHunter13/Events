@@ -41,7 +41,8 @@ cze:
   world-not-found: "Svet s nazvem %world% nebyl nalezen."
 
   items-given: "&e%material% &5(&d%amount%&5) &a byl uspesne rozdan mezi hracema na eventu"
-  wrong-mterial: "&cTento typ itemu nebyl nalezen."
+  item-generated: "&eItem &f%material% &ebyl vygeneraovan se vzacnosti &f&l%rarity%"
+  wrong-material: "&cTento typ itemu nebyl nalezen."
 
   effect-given: "&eEffekt %effect% byl byl dan vsem hracum na eventu."
   effect-cleared: "&6Vsechny efekty vseh hracu na eventy byly smazany."
@@ -114,6 +115,7 @@ eng:
   world-not-found: "World %world% was not found."
 
   items-given: "&e%material% &5(&d%amount%&5) &a was given to players successfully."
+  item-generated: '&eItem &f%material% &ewas generated with rarity &f&l%rarity%'
   wrong-material: "&cThis material was not found."
 
   effect-given: "&eEffekt %effect% byl byl dan vsem hracum na eventu."

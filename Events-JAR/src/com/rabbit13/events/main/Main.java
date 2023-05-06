@@ -5,7 +5,6 @@ import com.rabbit13.events.commands.tabcompleters.EventTabCompleter;
 import com.rabbit13.events.listeners.BackupListener;
 import com.rabbit13.events.listeners.EventListener;
 import com.rabbit13.events.listeners.ModListener;
-import com.rabbit13.events.managers.BackupManager;
 import com.rabbit13.events.managers.FileManager;
 import com.rabbit13.events.managers.PlayerManager;
 import lombok.val;
@@ -23,30 +22,28 @@ public final class Main extends JavaPlugin {
     //files
 
     private static FileManager filMan;
-    private static BackupManager bacMan;
     private static PluginDescriptionFile pdf;
     //values
     private static CommandSender sender;
     private static String prefix;
     private static String pluginPrefix;
 
-    @Override
-    public void onEnable() {
+    @Override public void onLoad() {
         instance = this;
+        saveDefaultConfig();
         filMan = new FileManager();
         pdf = getDescription();
         sender = getServer().getConsoleSender();
         prefix = this.getConfig().getString("prefix");
         pluginPrefix = this.getConfig().getString("plugin-prefix");
         debugMode = getConfig().getBoolean("debug");
+    }
 
-        if (filMan.checkWords()) {
-            sendLM(pluginPrefix + "Version of words is changed, adding", false, sender);
-        }
+    @Override
+    public void onEnable() {
+        filMan.checkWords();
         filMan.loadEvents();
         filMan.loadCounter();
-        saveDefaultConfig();
-        bacMan = new BackupManager();
         sendLM(pluginPrefix + " Setting up Listeners", false, sender); //Events
         getServer().getPluginManager().registerEvents(new EventListener(), this);
         getServer().getPluginManager().registerEvents(new ModListener(), this);
@@ -60,7 +57,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        PlayerManager.getJoinedEvent().forEach((p,d) -> PlayerManager.playerLeavingEvent(p,null,true));
+        PlayerManager.getJoinedEvent().forEach((p, d) -> PlayerManager.playerLeavingEvent(p, null, true));
         filMan.saveEvents();
         filMan.saveCounter();
         super.onDisable();
@@ -71,16 +68,16 @@ public final class Main extends JavaPlugin {
         return debugMode;
     }
 
+    public static void setDebugMode(boolean debugMode) {
+        Main.debugMode = debugMode;
+    }
+
     public static Main getInstance() {
         return instance;
     }
 
     public static FileManager getFilMan() {
         return filMan;
-    }
-
-    public static BackupManager getBacMan() {
-        return bacMan;
     }
 
     public static PluginDescriptionFile getPdf() {
@@ -95,8 +92,17 @@ public final class Main extends JavaPlugin {
         return prefix;
     }
 
+    public static void setPrefix(String prefix) {
+        Main.prefix = prefix;
+    }
+
     public static String getPluginPrefix() {
         return pluginPrefix;
     }
+
+    public static void setPluginPrefix(String pluginPrefix) {
+        Main.pluginPrefix = pluginPrefix;
+    }
+
     //</editor-fold>
 }

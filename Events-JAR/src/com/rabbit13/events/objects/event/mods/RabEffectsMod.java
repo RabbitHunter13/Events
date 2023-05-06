@@ -6,16 +6,15 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import static com.rabbit13.events.main.Misc.getSpecifiedItem;
 
-public final class RabEffectsMod extends RabMod implements Effects, Listener {
+public final class RabEffectsMod extends RabMod implements EffectsMod {
     @Getter
-    private Inventory effectsInv;
+    private final Inventory effectsInv;
 
     public RabEffectsMod(EventMods mods) {
         super(mods);
@@ -56,7 +55,7 @@ public final class RabEffectsMod extends RabMod implements Effects, Listener {
                 }
             }
             if (e.getCurrentItem() != null) {
-                if(!e.getCurrentItem().getType().equals(Material.POTION)) {
+                if (!e.getCurrentItem().getType().equals(Material.POTION)) {
                     e.setCancelled(true);
                 }
             }

@@ -7,10 +7,12 @@ import com.rabbit13.events.objects.event.EventMods;
 import com.rabbit13.events.objects.event.mods.Mod;
 import com.rabbit13.events.objects.event.tools.CheckpointLocation;
 import lombok.Getter;
+import lombok.val;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -46,21 +48,19 @@ public class PlayerManager {
         BackupManager.createBackup(player, data);
         EventMods mods = EventManager.getActiveEvent().getMods();
         clearPlayer(player, false);
-        if (mods.getStartingItems().isEnabled()) {
-            for (int i = 0; i < mods.getStartingItems().getStartingItems().getSize() - 1; i++) {
-                ItemStack item = mods.getStartingItems().getStartingItems().getItem(i);
+        if (mods.getStartingItemsMod().isEnabled()) {
+            for (int i = 0; i < mods.getStartingItemsMod().getStartingItems().getSize() - 1; i++) {
+                ItemStack item = mods.getStartingItemsMod().getStartingItems().getItem(i);
                 if (item != null) {
                     player.getInventory().addItem(item);
                 }
             }
         }
-        if (mods.getEffects().isEnabled()) {
-            for (ItemStack potion : EventManager.getActiveEvent().getMods().getEffects().getEffectsInv().getContents()) {
+        if (mods.getEffectsMod().isEnabled()) {
+            for (ItemStack potion : EventManager.getActiveEvent().getMods().getEffectsMod().getEffectsInv().getContents()) {
                 if (potion != null) {
                     if (potion.getType().equals(Material.POTION)) {
                         PotionMeta meta = (PotionMeta) potion.getItemMeta();
-
-                        debugMessage("PotionbaseData: " + meta.getBasePotionData().getType().getEffectType().toString());
                         if (meta != null) {
                             player.addPotionEffect(meta.getBasePotionData().getType().getEffectType().createEffect(Integer.MAX_VALUE, meta.getBasePotionData().isUpgraded() ? 1 : 0));
                         }
@@ -68,8 +68,8 @@ public class PlayerManager {
                 }
             }
         }
-        if (mods.getMoreHP().isEnabled()) {
-            Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue((mods.getMoreHP().getHealth() > 0) ? mods.getMoreHP().getHealth() : 1);
+        if (mods.getMoreHPMod().isEnabled()) {
+            Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).setBaseValue((mods.getMoreHPMod().getHealth() > 0) ? mods.getMoreHPMod().getHealth() : 1);
         }
         player.setHealth(Objects.requireNonNull(player.getAttribute(Attribute.GENERIC_MAX_HEALTH)).getBaseValue());
     }
@@ -85,16 +85,14 @@ public class PlayerManager {
         PlayerData data = joinedEvent.get(player);
         returnItems(player, data);
         if (!onDisable) {
-            Bukkit.getScheduler().runTask(getInstance(), () -> {
-                player.addPotionEffects(data.getEffects());
-                player.setFireTicks(0);
-            });
+            Bukkit.getScheduler().runTaskLater(getInstance(), () -> player.addPotionEffects(data.getEffects()), 2);
         }
         else {
             player.addPotionEffects(data.getEffects());
             player.setFireTicks(0);
         }
-        if (EventManager.getActiveEvent().getMods().getRewards().isEnabled()) {
+        assert EventManager.getActiveEvent() != null;
+        if (EventManager.getActiveEvent().getMods().getRewardItemsMod().isEnabled()) {
             debugMessage("PlayerManager#playerLeavingEvent reward: " + Arrays.toString(reward));
             if (reward != null && reward.length > 0) {
                 player.getInventory().addItem(reward);
@@ -104,10 +102,32 @@ public class PlayerManager {
         debugMessage("Removed from joined event?: " + (joinedEvent.remove(player) != null));
     }
 
+    public static Map<String, Integer> getTopWinners() {
+        Map<String, Integer> result = new HashMap<>();
+        Map<String, Integer> tempWinCounter = new HashMap<>(winCounter);
+        String tempName = "";
+        int tempInt = 0;
+        for (int i = 0; i < 5; i++) {
+            for (val entry : tempWinCounter.entrySet()) {
+                if (entry.getValue() > tempInt) {
+                    tempName = entry.getKey();
+                    tempInt = entry.getValue();
+                }
+            }
+            if (tempInt > 0) {
+                result.put(tempName, tempInt);
+                tempWinCounter.remove(tempName);
+            }
+            tempName = "";
+            tempInt = 0;
+        }
+        return result;
+    }
+
     //<editor-fold desc="Other Methods">
     private static void returnItems(Player player, PlayerData data) {
+        player.teleport(data.getLocation(), PlayerTeleportEvent.TeleportCause.PLUGIN);
         PlayerInventory inventory = player.getInventory();
-        player.teleport(data.getLocation());
         inventory.setHelmet(data.getHelmet());
         inventory.setChestplate(data.getChestplate());
         inventory.setLeggings(data.getLeggings());
@@ -131,6 +151,7 @@ public class PlayerManager {
         player.getEnderChest().clear();
         player.setExp(0);
         player.setLevel(0);
+        player.setCollidable(true);
         player.getActivePotionEffects().forEach(effect -> player.removePotionEffect(effect.getType()));
         player.setFoodLevel(20);
         if (!onDisable) {

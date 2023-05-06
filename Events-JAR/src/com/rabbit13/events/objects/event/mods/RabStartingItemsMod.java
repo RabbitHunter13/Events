@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import static com.rabbit13.events.main.Misc.getSpecifiedItem;
 
-public final class RabStartingItemsMod extends RabMod implements StartingItems, Listener {
+public final class RabStartingItemsMod extends RabMod implements StartingItemsMod, Listener {
     @Getter
     private Inventory startingItems;
 

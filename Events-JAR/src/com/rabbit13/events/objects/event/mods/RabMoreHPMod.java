@@ -10,7 +10,6 @@ import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
 import java.util.AbstractMap;
@@ -21,7 +20,7 @@ import static com.rabbit13.events.main.Main.getPrefix;
 import static com.rabbit13.events.main.Misc.getSpecifiedItem;
 import static com.rabbit13.events.main.Misc.sendLM;
 
-public final class RabMoreHPMod extends RabMod implements MoreHP, Listener {
+public final class RabMoreHPMod extends RabMod implements MoreHPMod {
     @Getter @Setter
     private double health;
 
@@ -43,7 +42,7 @@ public final class RabMoreHPMod extends RabMod implements MoreHP, Listener {
     public void initialize() {
         getInventory().setItem(1, getSpecifiedItem(Material.BOOK, 1, "Health",
                                                    "set how much health players should have",
-                                                   "value: " + health));
+                                                   "value: &d" + health));
     }
 
     @EventHandler
@@ -75,7 +74,7 @@ public final class RabMoreHPMod extends RabMod implements MoreHP, Listener {
                     , true, sender);
             getInventory().setItem(1, getSpecifiedItem(Material.BOOK, 1, "Health",
                                                        "set how much health players should have",
-                                                       "value: " + health));
+                                                       "value: &d" + health));
         } catch (NumberFormatException e) {
             sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-modification-number-error"), true, sender);
         }

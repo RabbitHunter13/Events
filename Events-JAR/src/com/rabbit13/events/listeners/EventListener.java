@@ -25,7 +25,7 @@ public final class EventListener implements Listener {
     @EventHandler
     public void onDisconnect(PlayerQuitEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer()))
-            PlayerManager.playerLeavingEvent(e.getPlayer(), null,false);
+            PlayerManager.playerLeavingEvent(e.getPlayer(), null, false);
         PlayerManager.getModifyingEvent().remove(e.getPlayer());
     }
 
@@ -96,7 +96,9 @@ public final class EventListener implements Listener {
                 e.setRespawnLocation(PlayerManager.getCheckpointed().get(e.getPlayer()).getSavedLocation());
             }
             else {
-                e.setRespawnLocation(EventManager.getActiveEvent().getTeleport());
+                if (EventManager.getActiveEvent() != null) {
+                    e.setRespawnLocation(EventManager.getActiveEvent().getTeleport());
+                }
             }
         }
     }
@@ -108,8 +110,9 @@ public final class EventListener implements Listener {
     public void onMovement(PlayerMoveEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
             if (e.getTo() != null) {
+                assert EventManager.getActiveEvent() != null;
                 if (EventManager.getActiveEvent().getCheckpoints().contains(e.getTo().getBlock().getLocation())) {
-                    if (EventManager.getActiveEvent().getMods().getCheckpoints().isEnabled()) {
+                    if (EventManager.getActiveEvent().getMods().getCheckpointsMod().isEnabled()) {
                         if (PlayerManager.getCheckpointed().containsKey(e.getPlayer())) {
                             if (!PlayerManager.getCheckpointed().get(e.getPlayer()).getCheckpointLocation().equals(e.getTo().getBlock().getLocation())) {
                                 PlayerManager.getCheckpointed().get(e.getPlayer()).setCheckpointLocation(e.getTo().getBlock().getLocation());
@@ -124,12 +127,13 @@ public final class EventListener implements Listener {
                     }
                 }
                 if (EventManager.getActiveEvent().getFinish() != null) {
-                    if (EventManager.getActiveEvent().getMods().getRewards().isEnabled()) {
+                    if (EventManager.getActiveEvent().getMods().getRewardItemsMod().isEnabled()) {
                         if (EventManager.getActiveEvent().getFinish().getBlock().getLocation().equals(e.getTo().getBlock().getLocation())) {
-                            Bukkit.dispatchCommand(Main.getSender(), "e b &3&l"+ (EventManager.getActiveEvent().getMods().getRewards().getWinnerIndex()+1) + ". Misto &f&l" + e.getPlayer().getName());
-                            PlayerManager.playerLeavingEvent(e.getPlayer(), EventManager.getActiveEvent().getMods().getRewards().giveRewardToPlayer(), false);
-                            if(EventManager.getActiveEvent().getMods().getRewards().getWinnerIndex() == 0) {
-                                Bukkit.dispatchCommand(Main.getSender(),"e end");
+                            Bukkit.dispatchCommand(Main.getSender(), "e b &3&l" + (EventManager.getActiveEvent().getMods().getRewardItemsMod().getWinnerIndex() + 1) + ". Misto &f&l" + e.getPlayer().getName());
+                            Bukkit.dispatchCommand(Main.getSender(), "e win add " + e.getPlayer().getName());
+                            PlayerManager.playerLeavingEvent(e.getPlayer(), EventManager.getActiveEvent().getMods().getRewardItemsMod().giveRewardToPlayer(), false);
+                            if (EventManager.getActiveEvent().getMods().getRewardItemsMod().getWinnerIndex() == 0) {
+                                Bukkit.dispatchCommand(Main.getSender(), "e end");
                             }
                         }
                     }
@@ -137,4 +141,5 @@ public final class EventListener implements Listener {
             }
         }
     }
+
 }

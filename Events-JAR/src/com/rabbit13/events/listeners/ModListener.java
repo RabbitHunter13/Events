@@ -5,18 +5,22 @@ import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.PlayerManager;
 import lombok.val;
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityToggleSwimEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import static com.rabbit13.events.main.Misc.sendLM;
 
+/**
+ * Listeners here listens just for active event
+ */
 public class ModListener implements Listener {
+
 
     /**
      * Monitoring Chat if someone modifying string values
@@ -31,7 +35,7 @@ public class ModListener implements Listener {
     }
 
     /**
-     * handles lava/fall damage mods
+     * handles fall damage mods
      */
     @EventHandler
     public void damageReducer(EntityDamageEvent e) {
@@ -40,7 +44,30 @@ public class ModListener implements Listener {
             player = (Player) e.getEntity();
             if (PlayerManager.getJoinedEvent().containsKey(player)) {
                 if (e.getCause().equals(EntityDamageEvent.DamageCause.FALL)) {
-                    if (EventManager.getActiveEvent().getMods().getFallDamage().isEnabled()) {
+                    if (EventManager.getActiveEvent() != null) {
+                        if (EventManager.getActiveEvent().getMods().getFallDamageMod().isEnabled()) {
+                            e.setCancelled(true);
+                        }
+                    }
+                }
+                else if (e.getCause().equals(EntityDamageEvent.DamageCause.LAVA)) {
+                    if (EventManager.getActiveEvent() != null) {
+                        if (EventManager.getActiveEvent().getMods().getLavaEqualFailMod().isEnabled()) {
+                            e.setCancelled(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    public void disableSwim(EntityToggleSwimEvent e) {
+        if (e.getEntity() instanceof Player) {
+            Player player = (Player) e.getEntity();
+            if (EventManager.getActiveEvent() != null) {
+                if (PlayerManager.getJoinedEvent().containsKey(player)) {
+                    if (EventManager.getActiveEvent().getMods().getNoSwimMod().isEnabled()) {
                         e.setCancelled(true);
                     }
                 }
@@ -51,12 +78,14 @@ public class ModListener implements Listener {
     @EventHandler
     public void onMovement(PlayerMoveEvent e) {
         if (PlayerManager.getJoinedEvent().containsKey(e.getPlayer())) {
-            assert e.getTo() != null;
-            if (e.getTo().getBlock().getRelative(BlockFace.DOWN).getType().equals(Material.LAVA)) {
-                if (EventManager.getActiveEvent().getMods().getLavaEqualFail().isEnabled()) {
-                    e.setCancelled(true);
-                    PlayerManager.playerLeavingEvent(e.getPlayer(),null,false);
-                    sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-fail"), true, e.getPlayer());
+            if (e.getTo() != null) {
+                if (e.getTo().getBlock().getType().equals(Material.LAVA)) {
+                    if (EventManager.getActiveEvent() != null) {
+                        if (EventManager.getActiveEvent().getMods().getLavaEqualFailMod().isEnabled()) {
+                            PlayerManager.playerLeavingEvent(e.getPlayer(), null, false);
+                            sendLM(Main.getPrefix() + " " + Main.getFilMan().getWords().getString("event-fail"), true, e.getPlayer());
+                        }
+                    }
                 }
             }
         }

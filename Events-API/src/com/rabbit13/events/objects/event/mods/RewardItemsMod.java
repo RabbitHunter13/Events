@@ -3,7 +3,7 @@ package com.rabbit13.events.objects.event.mods;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-public interface RewardItems extends Mod {
+public interface RewardItemsMod extends Mod {
 
     int getMaxWins();
 

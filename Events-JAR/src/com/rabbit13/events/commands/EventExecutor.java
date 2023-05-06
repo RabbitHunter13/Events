@@ -4,12 +4,11 @@ import com.rabbit13.events.events.PlayerJoinContestEvent;
 import com.rabbit13.events.events.PlayerLeaveContestEvent;
 import com.rabbit13.events.events.RabPlayerJoinContestEvent;
 import com.rabbit13.events.events.RabPlayerLeaveContestEvent;
+import com.rabbit13.events.main.Main;
 import com.rabbit13.events.managers.BackupManager;
 import com.rabbit13.events.managers.EventManager;
 import com.rabbit13.events.managers.PlayerManager;
-import com.rabbit13.events.objects.Backup;
-import com.rabbit13.events.objects.PlayerData;
-import com.rabbit13.events.objects.RabPlayerData;
+import com.rabbit13.events.objects.*;
 import com.rabbit13.events.objects.event.Event;
 import com.rabbit13.events.objects.event.RabEvent;
 import org.bukkit.Bukkit;
@@ -23,6 +22,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.jetbrains.annotations.NotNull;
@@ -44,425 +44,10 @@ public final class EventExecutor implements CommandExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) {
-            if (args.length == 0) {
-                sendLM(getPluginPrefix() + " This command have to be executed as player!", false, sender);
-                return true;
-            }
-            else {
-                switch (args[0]) {
-                    case "info": {
-                        if (args.length == 1) {
-                            sendLM("&6" + getPrefix() + " &eCreated by Rabbit_Hunter13", false, sender);
-                            sendLM("&3Version &b" + getPdf().getVersion(), false, sender);
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "debug": {
-                        if (args.length == 1) {
-
-                            sendLM(getPrefix() + " All maps and lists in plugin:", false, sender);
-                            //<editor-fold desc="Sender Debug">
-                            //<editor-fold desc="Events">
-                            sendLM("&c## &6Events &c##", false, sender);
-                            EventManager.getEvents().forEach((s, e) -> sendLM(
-                                    "&6Name: &e" + s + "&f, &6Owner: &e" + e.getOwner(),
-                                    false, sender));
-                            //</editor-fold>
-                            //<editor-fold desc="Players Joined">
-                            sendLM("&c## &6Players Joined event &c##", false, sender);
-                            PlayerManager.getJoinedEvent().forEach((p, d) -> sendLM(
-                                    "&6Name: &e" + p.getName() + "&f, &6Data: &e" + d.toString(),
-                                    false, sender));
-                            //</editor-fold>
-                            //<editor-fold desc="Players Checkpointed">
-                            sendLM("&c## &6Players checkpointed &c##", false, sender);
-                            PlayerManager.getCheckpointed().forEach((p, c) -> sendLM(
-                                    "&6Name: &e" + p.getName() + "&f, &6Checkpoint: &e" + c.toString(),
-                                    false, sender)
-                            );
-                            //</editor-fold>
-                            //<editor-fold desc="Admins modifying events">
-                            sendLM("&c## &6Players modifying &c##", false, sender);
-                            PlayerManager.getModifyingEvent().forEach((p, entry) -> sendLM(
-                                    "&6Name: &e" + p.getName() + "&f, &6Modifying Event &e" + entry.getValue().getName() + " &7Slot: &8" + entry.getKey(),
-                                    false, sender));
-                            PlayerManager.getModifyingMods().forEach((p, entry) -> sendLM(
-                                    "&6Name: &e" + p.getName() + "&f, &6Modifying Mods &e" + " &7Slot: &8" + entry.getKey(),
-                                    true, sender));
-                            //</editor-fold>
-                            //<editor-fold desc="Player backups">
-                            sendLM("&c## &6Player backups &c##", false, sender);
-                            BackupManager.getBackups().forEach((p, b) -> sendLM("&6Name: " + p, false, sender));
-                            //</editor-fold>
-                            //</editor-fold>
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "b": {
-                        if (args.length > 1) {
-                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', buildStringFromArgs(args)));
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "help": {
-                        if (args.length == 1) {
-                            //list of usages
-                            sendLM(getPrefix() + " " + getPdf().getName() + " Usages:", false, sender);
-                            usages.forEach(usage -> sendLM("&3" + usage, false, sender));
-                            adminUsages.forEach(usage -> sendLM("&3" + usage, false, sender));
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "list": {
-                        if (args.length == 1) {
-                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-list-official"), false, sender);
-                            List<Event> otherEvents = new ArrayList<>();
-                            if (!EventManager.getEvents().isEmpty()) {
-                                EventManager.getEvents().forEach((name, event) -> {
-                                    assert event.getTeleport().getWorld() != null;
-                                    if (event.getTeleport().getWorld().getName().equalsIgnoreCase(getInstance().getConfig().getString("event-world"))) {
-                                        sendLM("&3\u2022 " + name, false, sender);
-                                    }
-                                    else {
-                                        otherEvents.add(event);
-                                    }
-                                });
-                            }
-                            if (!otherEvents.isEmpty()) {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-list-other"), false, sender);
-                                otherEvents.forEach(event -> {
-                                    assert event.getTeleport().getWorld() != null;
-                                    sendLM("&3[" + event.getTeleport().getWorld().getName() + "] &3\u2022 " + event.getName(), false, sender);
-                                });
-                            }
-                        }
-                        else if (args.length == 2) {
-                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-list-owner"))
-                                           .replace("%owner%", args[1]),
-                                   false,
-                                   sender);
-                            for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
-                                if (entry.getValue().getOwner().equals(args[1])) {
-                                    sendLM("&3\u2022 " + entry.getKey(), false, sender);
-                                }
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "clearinv": {
-                        if (args.length == 1) {
-                            clearInventory();
-                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("inventory-cleared"), false, sender);
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "cleareff": {
-                        if (args.length == 1) {
-                            clearEffects();
-                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("effects-cleared"), true, sender);
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "lock": {
-                        if (args.length == 1) {
-                            Event event = EventManager.getActiveEvent();
-                            if (event != null) {
-                                if (!event.isLockedTeleport()) {
-                                    event.setLockedTeleport(true);
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-lock"), false, sender);
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-locked"), false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "unlock": {
-                        if (args.length == 1) {
-                            Event event = EventManager.getActiveEvent();
-                            if (event != null) {
-                                if (event.isLockedTeleport()) {
-                                    event.setLockedTeleport(false);
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-unlock"), false, sender);
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-unlocked"), false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "end": {
-                        if (args.length == 1) {
-                            endEvent();
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "start": {
-                        if (args.length == 2) {
-                            if (EventManager.getActiveEvent() == null) {
-                                EventManager.setActiveEvent(args[1]);
-                                if (EventManager.getActiveEvent() == null) {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-started"))
-                                                   .replace("%event%", EventManager.getActiveEvent().getName())
-                                            , true
-                                            , sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-started"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "remove": {
-                        if (args.length == 2) {
-                            if (EventManager.getEventByName(args[1]) != null) {
-                                EventManager.getEvents().remove(args[1]);
-                                sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-deleted")).replace("%event%", args[1]), false, sender);
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "kick": {
-                        if (args.length == 2) {
-                            Player target = getPlayer(args[1]);
-                            Event event = EventManager.getActiveEvent();
-                            if (event != null) {
-                                if (target != null) {
-                                    if (PlayerManager.getJoinedEvent().containsKey(target)) {
-                                        if (!target.hasPermission("events.staff")
-                                                || target.hasPermission("events.moderator")) {
-                                            PlayerManager.playerLeavingEvent(target, null, false);
-                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-kicked-admin-side"))
-                                                           .replace("%player%", args[1])
-                                                           .replace("%event%", event.getName())
-                                                    , false
-                                                    , sender);
-                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-kicked-player-side"), true, target);
-                                        }
-                                        else {
-                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-is-admin"), false, sender);
-                                        }
-                                    }
-                                    else {
-                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found-at-event"), false, sender);
-                                    }
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found"), false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "ban": {
-                        if (args.length == 2) {
-                            Player target = getPlayer(args[1]);
-                            Event event = EventManager.getActiveEvent();
-                            if (event != null) {
-                                if (target != null) {
-                                    if (PlayerManager.getJoinedEvent().containsKey(target)) {
-                                        if (!target.hasPermission("events.staff")
-                                                || !target.hasPermission("events.moderator")) {
-                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-admin-side"))
-                                                           .replace("%player%", args[1])
-                                                           .replace("%event%", event.getName())
-                                                    , false
-                                                    , sender
-                                            );
-                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-player-side"))
-                                                           .replace("%event%", event.getName())
-                                                    , true
-                                                    , target);
-                                            PlayerManager.playerLeavingEvent(target, null, false);
-                                            //banned
-                                            List<String> banned = EventManager.getActiveEvent().getBanned();
-                                            debugMessage("Banned?: " + banned.add(target.getName()));
-                                        }
-                                        else {
-                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-is-admin"), false, sender);
-                                        }
-                                    }
-                                    else {
-                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found-at-event"), false, sender);
-                                    }
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found"), false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "checkpoint": {
-                        if (args.length == 2) {
-                            if (EventManager.getActiveEvent() != null) {
-                                if (args[1].equals("removeall")) {
-                                    EventManager.getActiveEvent().getCheckpoints().clear();
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed-all"), false, sender);
-                                }
-                                else if (args[1].equals("list")) {
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-list"))
-                                                   .replace("%event%", EventManager.getActiveEvent().getName())
-                                            , false, sender);
-                                    EventManager.getActiveEvent().getCheckpoints().forEach(chp -> sendLM("&3\u2022 "
-                                                                                                                 + "[" + chp.getBlockX()
-                                                                                                                 + ", " + chp.getBlockY()
-                                                                                                                 + ", " + chp.getBlockZ()
-                                                                                                                 + "]"
-                                            , false, sender)
-                                    );
-                                }
-                                else {
-                                    sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
-                            }
-                        }
-                        if (args.length == 3) {
-                            Event event = EventManager.getEventByName(args[2]);
-                            if (event != null) {
-                                if (args[1].equals("removeall")) {
-                                    event.getCheckpoints().clear();
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed-all"), false, sender);
-                                }
-                                else if (args[1].equals("list")) {
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-list"))
-                                                   .replace("%event%", event.getName())
-                                            , false, sender);
-                                    EventManager.getActiveEvent().getCheckpoints().forEach(chp -> sendLM("&3\u2022 "
-                                                                                                                 + "[" + chp.getBlockX()
-                                                                                                                 + ", " + chp.getBlockY()
-                                                                                                                 + ", " + chp.getBlockZ()
-                                                                                                                 + "]"
-                                            , false, sender)
-                                    );
-                                }
-                                else {
-                                    sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "unban": {
-                        if (args.length == 3) {
-                            Event event = EventManager.getEventByName(args[2]);
-                            String target = args[1];
-                            if (event != null) {
-                                if (event.getBanned().remove(target)) {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-unbanned"), false, sender);
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("banned-player-not-found")).replace("%event%", event.getName()), false, sender);
-                                }
-                            }
-                            else {
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
-                            }
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    case "reload": {
-                        if (args.length == 1) {
-                            //config
-                            getInstance().reloadConfig();
-                            //events & counter
-                            getFilMan().loadEvents();
-                            getFilMan().loadCounter();
-                            //lang
-                            getFilMan().setWords(YamlConfiguration.loadConfiguration(getFilMan().getLangFile()).getConfigurationSection(Objects.requireNonNull(getInstance().getConfig().getString("lang"))));
-                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("config-reloaded"), false, sender);
-                        }
-                        else {
-                            wrongCommand(sender);
-                        }
-                        break;
-                    }
-                    default: {
-                        wrongCommand(sender);
-                        break;
-                    }
-                }
-            }
-        }
-        else {
-            Player plsender = (Player) sender;
-            if (args.length == 0) {
+        boolean isPlayer = sender instanceof Player;
+        if (args.length == 0) {
+            if (isPlayer) {
+                Player plsender = (Player) sender;
                 if (plsender.hasPermission("events.staff")
                         || plsender.hasPermission("events.join")) {
                     if (EventManager.getActiveEvent() != null) {
@@ -510,17 +95,25 @@ public final class EventExecutor implements CommandExecutor {
                         }
                     }
                     else {
+                        debugMessage("FilMan: " + (getFilMan() != null));
+                        debugMessage("Words: " + (getFilMan().getWords() != null));
                         sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), true, plsender);
                     }
                 }
                 else {
                     sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
                 }
-                return true;
             }
             else {
-                switch (args[0]) {
-                    case "info": {
+                sendLM(getPluginPrefix() + " This command have to be executed as player!", false, sender);
+                return true;
+            }
+        }
+        else {
+            switch (args[0]) {
+                case "info": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             sendLM("&6" + getPrefix() + " &eCreated by Rabbit_Hunter13", true, plsender);
                             sendLM("&3Version &b" + getPdf().getVersion(), true, plsender);
@@ -528,9 +121,21 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "debug": {
+                    else {
+                        if (args.length == 1) {
+                            sendLM("&6" + getPrefix() + " &eCreated by Rabbit_Hunter13", false, sender);
+                            sendLM("&3Version &b" + getPdf().getVersion(), false, sender);
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "debug": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")) {
                                 sendLM(getPrefix() + " All maps and lists in plugin:", true, plsender);
@@ -570,12 +175,61 @@ public final class EventExecutor implements CommandExecutor {
                                 //</editor-fold>
                             }
                             else {
-                                wrongCommand(plsender);
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, sender);
                             }
                         }
-                        break;
+                        else {
+                            wrongCommand(plsender);
+                        }
                     }
-                    case "b": {
+                    else {
+                        if (args.length == 1) {
+
+                            sendLM(getPrefix() + " All maps and lists in plugin:", false, sender);
+                            //<editor-fold desc="Sender Debug">
+                            //<editor-fold desc="Events">
+                            sendLM("&c## &6Events &c##", false, sender);
+                            EventManager.getEvents().forEach((s, e) -> sendLM(
+                                    "&6Name: &e" + s + "&f, &6Owner: &e" + e.getOwner(),
+                                    false, sender));
+                            //</editor-fold>
+                            //<editor-fold desc="Players Joined">
+                            sendLM("&c## &6Players Joined event &c##", false, sender);
+                            PlayerManager.getJoinedEvent().forEach((p, d) -> sendLM(
+                                    "&6Name: &e" + p.getName() + "&f, &6Data: &e" + d.toString(),
+                                    false, sender));
+                            //</editor-fold>
+                            //<editor-fold desc="Players Checkpointed">
+                            sendLM("&c## &6Players checkpointed &c##", false, sender);
+                            PlayerManager.getCheckpointed().forEach((p, c) -> sendLM(
+                                    "&6Name: &e" + p.getName() + "&f, &6Checkpoint: &e" + c.toString(),
+                                    false, sender)
+                            );
+                            //</editor-fold>
+                            //<editor-fold desc="Admins modifying events">
+                            sendLM("&c## &6Players modifying &c##", false, sender);
+                            PlayerManager.getModifyingEvent().forEach((p, entry) -> sendLM(
+                                    "&6Name: &e" + p.getName() + "&f, &6Modifying Event &e" + entry.getValue().getName() + " &7Slot: &8" + entry.getKey(),
+                                    false, sender));
+                            PlayerManager.getModifyingMods().forEach((p, entry) -> sendLM(
+                                    "&6Name: &e" + p.getName() + "&f, &6Modifying Mods &e" + " &7Slot: &8" + entry.getKey(),
+                                    true, sender));
+                            //</editor-fold>
+                            //<editor-fold desc="Player backups">
+                            sendLM("&c## &6Player backups &c##", false, sender);
+                            BackupManager.getBackups().forEach((p, b) -> sendLM("&6Name: " + p, false, sender));
+                            //</editor-fold>
+                            //</editor-fold>
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "b": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length > 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -589,9 +243,20 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "help": {
+                    else {
+                        if (args.length > 1) {
+                            Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', buildStringFromArgs(args)));
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "help": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             //list of usages
                             sendLM(getPrefix() + " " + getPdf().getName() + " Usages:", true, plsender);
@@ -603,9 +268,23 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "list": {
+                    else {
+                        if (args.length == 1) {
+                            //list of usages
+                            sendLM(getPrefix() + " " + getPdf().getName() + " Usages:", false, sender);
+                            usages.forEach(usage -> sendLM("&3" + usage, false, sender));
+                            adminUsages.forEach(usage -> sendLM("&3" + usage, false, sender));
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "list": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -615,7 +294,7 @@ public final class EventExecutor implements CommandExecutor {
                                 EventManager.getEvents().forEach((name, event) -> {
                                     assert event.getTeleport().getWorld() != null;
                                     if (event.getTeleport().getWorld().getName().equalsIgnoreCase(getInstance().getConfig().getString("event-world"))) {
-                                        sendLM("&3\u2022 " + name, true, plsender);
+                                        sendLM("&3• " + name, true, plsender);
                                     }
                                     else {
                                         otherEvents.add(event);
@@ -625,7 +304,7 @@ public final class EventExecutor implements CommandExecutor {
                                     sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-list-other"), true, plsender);
                                     otherEvents.forEach(event -> {
                                         assert event.getTeleport().getWorld() != null;
-                                        sendLM("&3[" + event.getTeleport().getWorld().getName() + "] &3\u2022 " + event.getName(), true, plsender);
+                                        sendLM("&3[" + event.getTeleport().getWorld().getName() + "] &3• " + event.getName(), true, plsender);
                                     });
                                 }
                             }
@@ -643,7 +322,7 @@ public final class EventExecutor implements CommandExecutor {
                                        plsender);
                                 for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
                                     if (entry.getValue().getOwner().equals(args[1])) {
-                                        sendLM("&3\u2022 " + entry.getKey(), true, plsender);
+                                        sendLM("&3• " + entry.getKey(), true, plsender);
                                     }
                                 }
                             }
@@ -651,103 +330,152 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "win": {
+                    else {
                         if (args.length == 1) {
-                            if (plsender.hasPermission("events.staff")
-                                    || plsender.hasPermission("events.join")) {
-                                if (PlayerManager.getWinCounter().get(plsender.getName()) != null) {
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                   .replace("%wins%", PlayerManager.getWinCounter().get(plsender.getName()).toString())
-                                            , true, plsender);
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                   .replace("%wins%", "0")
-                                            , true, plsender);
-                                }
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-list-official"), false, sender);
+                            List<Event> otherEvents = new ArrayList<>();
+                            if (!EventManager.getEvents().isEmpty()) {
+                                EventManager.getEvents().forEach((name, event) -> {
+                                    assert event.getTeleport().getWorld() != null;
+                                    if (event.getTeleport().getWorld().getName().equalsIgnoreCase(getInstance().getConfig().getString("event-world"))) {
+                                        sendLM("&3• " + name, false, sender);
+                                    }
+                                    else {
+                                        otherEvents.add(event);
+                                    }
+                                });
+                            }
+                            if (!otherEvents.isEmpty()) {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-list-other"), false, sender);
+                                otherEvents.forEach(event -> {
+                                    assert event.getTeleport().getWorld() != null;
+                                    sendLM("&3[" + event.getTeleport().getWorld().getName() + "] &3• " + event.getName(), false, sender);
+                                });
                             }
                         }
                         else if (args.length == 2) {
-                            if (args[1].equals("list")) {
-                                if (plsender.hasPermission("events.staff")
-                                        || plsender.hasPermission("events.moderator")
-                                        || plsender.hasPermission("events.win.list")) {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("win-counter-list"), true, plsender);
-                                    PlayerManager.getWinCounter().forEach((name, number) -> sendLM("&3\u2022 " + name + ": " + number, true, plsender));
+                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-list-owner"))
+                                           .replace("%owner%", args[1]),
+                                   false,
+                                   sender);
+                            for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
+                                if (entry.getValue().getOwner().equals(args[1])) {
+                                    sendLM("&3• " + entry.getKey(), false, sender);
                                 }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
-                                }
-                            }
-                            else if (args[1].equals(plsender.getName())
-                                    || args[1].equals("me")) {
-                                if (plsender.hasPermission("events.staff")
-                                        || plsender.hasPermission("events.moderator")
-                                        || plsender.hasPermission("events.win.list.himself")) {
-                                    if (PlayerManager.getWinCounter().get(plsender.getName()) != null) {
-                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                       .replace("%wins%", PlayerManager.getWinCounter().get(args[1]).toString())
-                                                , true, plsender);
-                                    }
-                                    else {
-                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                       .replace("%wins%", "0")
-                                                , true, plsender);
-                                    }
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
-                                }
-                            }
-                            else {
-                                if (plsender.hasPermission("events.staff")
-                                        || plsender.hasPermission("events.moderator")
-                                        || plsender.hasPermission("events.win.list.others")) {
-                                    if (PlayerManager.getWinCounter().get(args[1]) != null) {
-                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                       .replace("%wins%", PlayerManager.getWinCounter().get(args[1]).toString())
-                                                , true, plsender);
-                                    }
-                                    else {
-                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
-                                                       .replace("%wins%", "0")
-                                                , true, plsender);
-                                    }
-                                }
-                                else {
-                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
-                                }
-                            }
-                        }
-                        else if (args.length == 3) {
-                            if (args[1].equals("add")) {
-                                if (plsender.hasPermission("events.staff")
-                                        || plsender.hasPermission("events.moderator")
-                                        || plsender.hasPermission("events.win")) {
-                                    if (!PlayerManager.getWinCounter().containsKey(args[2])) {
-                                        PlayerManager.getWinCounter().put(args[2], 1);
-                                    }
-                                    else {
-                                        PlayerManager.getWinCounter().put(args[2], PlayerManager.getWinCounter().get(args[2]) + 1);
-                                    }
-                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-add"))
-                                                   .replace("%player%", args[2])
-                                            , true, plsender);
-                                    getFilMan().saveCounter();
-                                }
-                            }
-                            else {
-                                wrongCommand(plsender);
                             }
                         }
                         else {
-                            wrongCommand(plsender);
+                            wrongCommand(sender);
                         }
-                        break;
                     }
-                    case "checkpoint": {
+                    break;
+                }
+                case "win": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
+                        switch (args.length) {
+                            case 1: {
+                                if (plsender.hasPermission("events.staff")
+                                        || plsender.hasPermission("events.join")) {
+                                    if (PlayerManager.getWinCounter().get(plsender.getName()) != null) {
+                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
+                                                       .replace("%wins%", PlayerManager.getWinCounter().get(plsender.getName()).toString())
+                                                , true, plsender);
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
+                                                       .replace("%wins%", "0")
+                                                , true, plsender);
+                                    }
+                                }
+                                break;
+                            }
+                            case 2: {
+                                if (args[1].equals("list")) {
+                                    if (plsender.hasPermission("events.staff")
+                                            || plsender.hasPermission("events.moderator")
+                                            || plsender.hasPermission("events.win.list")) {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("win-counter-list"), true, plsender);
+                                        PlayerManager.getTopWinners().forEach((name, number) -> sendLM("&3• " + name + ": " + number, true, plsender));
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
+                                    }
+                                }
+                                else if (args[1].equals(plsender.getName())
+                                        || args[1].equals("me")) {
+                                    if (plsender.hasPermission("events.staff")
+                                            || plsender.hasPermission("events.moderator")
+                                            || plsender.hasPermission("events.win.list.himself")) {
+                                        if (PlayerManager.getWinCounter().get(plsender.getName()) != null) {
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
+                                                           .replace("%wins%", PlayerManager.getWinCounter().get(args[1]).toString())
+                                                    , true, plsender);
+                                        }
+                                        else {
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
+                                                           .replace("%wins%", "0")
+                                                    , true, plsender);
+                                        }
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
+                                    }
+                                }
+                                else {
+                                    if (plsender.hasPermission("events.staff")
+                                            || plsender.hasPermission("events.moderator")
+                                            || plsender.hasPermission("events.win.list.others")) {
+                                        if (PlayerManager.getWinCounter().get(args[1]) != null) {
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
+                                                           .replace("%wins%", PlayerManager.getWinCounter().get(args[1]).toString())
+                                                    , true, plsender);
+                                        }
+                                        else {
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-show"))
+                                                           .replace("%wins%", "0")
+                                                    , true, plsender);
+                                        }
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
+                                    }
+                                }
+                                break;
+                            }
+                            case 3: {
+                                if (args[1].equals("add")) {
+                                    if (plsender.hasPermission("events.staff")
+                                            || plsender.hasPermission("events.moderator")
+                                            || plsender.hasPermission("events.win")) {
+                                        if (!PlayerManager.getWinCounter().containsKey(args[2])) {
+                                            PlayerManager.getWinCounter().put(args[2], 1);
+                                        }
+                                        else {
+                                            PlayerManager.getWinCounter().put(args[2], PlayerManager.getWinCounter().get(args[2]) + 1);
+                                        }
+                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("win-counter-add"))
+                                                       .replace("%player%", args[2])
+                                                , true, plsender);
+                                        getFilMan().saveCounter();
+                                    }
+                                }
+                                else {
+                                    wrongCommand(plsender);
+                                }
+                                break;
+                            }
+                            default:
+                                wrongCommand(plsender);
+                                break;
+                        }
+                    }
+                    break;
+                }
+                case "checkpoint": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -792,7 +520,7 @@ public final class EventExecutor implements CommandExecutor {
                                                 sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-list"))
                                                                .replace("%event%", EventManager.getActiveEvent().getName())
                                                         , true, plsender);
-                                                EventManager.getActiveEvent().getCheckpoints().forEach(chp -> sendLM("&3\u2022 "
+                                                EventManager.getActiveEvent().getCheckpoints().forEach(chp -> sendLM("&3• "
                                                                                                                              + "[" + chp.getBlockX()
                                                                                                                              + ", " + chp.getBlockY()
                                                                                                                              + ", " + chp.getBlockZ()
@@ -802,7 +530,7 @@ public final class EventExecutor implements CommandExecutor {
                                                 break;
                                             }
                                             default: {
-                                                sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
+                                                sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", true, sender);
                                                 break;
                                             }
                                         }
@@ -861,7 +589,7 @@ public final class EventExecutor implements CommandExecutor {
                                                 sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-list"))
                                                                .replace("%event%", event.getName())
                                                         , true, plsender);
-                                                event.getCheckpoints().forEach(chp -> sendLM("&3\u2022 "
+                                                event.getCheckpoints().forEach(chp -> sendLM("&3• "
                                                                                                      + "[" + chp.getBlockX()
                                                                                                      + ", " + chp.getBlockY()
                                                                                                      + ", " + chp.getBlockZ()
@@ -871,7 +599,7 @@ public final class EventExecutor implements CommandExecutor {
                                                 break;
                                             }
                                             default: {
-                                                sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
+                                                sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", true, sender);
                                                 break;
                                             }
                                         }
@@ -891,9 +619,76 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "quit": {
+                    else {
+                        if (args.length == 2) {
+                            if (EventManager.getActiveEvent() != null) {
+                                if (args[1].equals("removeall")) {
+                                    EventManager.getActiveEvent().getCheckpoints().clear();
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed-all"), false, sender);
+                                }
+                                else if (args[1].equals("list")) {
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-list"))
+                                                   .replace("%event%", EventManager.getActiveEvent().getName())
+                                            , false, sender);
+                                    EventManager.getActiveEvent().getCheckpoints().forEach(chp -> sendLM("&3• "
+                                                                                                                 + "[" + chp.getBlockX()
+                                                                                                                 + ", " + chp.getBlockY()
+                                                                                                                 + ", " + chp.getBlockZ()
+                                                                                                                 + "]"
+                                            , false, sender)
+                                    );
+                                }
+                                else {
+                                    sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
+                            }
+                        }
+                        else if (args.length == 3) {
+                            Event event = EventManager.getEventByName(args[2]);
+                            if (event != null) {
+                                if (args[1].equals("removeall")) {
+                                    event.getCheckpoints().clear();
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("checkpoint-removed-all"), false, sender);
+                                }
+                                else if (args[1].equals("list")) {
+
+                                    if (EventManager.getActiveEvent() != null) {
+                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("checkpoint-list"))
+                                                       .replace("%event%", event.getName())
+                                                , false, sender);
+                                        EventManager.getActiveEvent().getCheckpoints().forEach(chp -> sendLM("&3• "
+                                                                                                                     + "[" + chp.getBlockX()
+                                                                                                                     + ", " + chp.getBlockY()
+                                                                                                                     + ", " + chp.getBlockZ()
+                                                                                                                     + "]"
+                                                , false, sender)
+                                        );
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
+                                    }
+                                }
+                                else {
+                                    sendLM(getPluginPrefix() + " Wrong command, type " + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "quit": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.join")) {
                                 if (EventManager.getActiveEvent() != null) {
@@ -920,9 +715,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "lock": {
+                    break;
+                }
+                case "lock": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")) {
@@ -947,9 +745,32 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "unlock": {
+                    else {
+                        if (args.length == 1) {
+                            Event event = EventManager.getActiveEvent();
+                            if (event != null) {
+                                if (!event.isLockedTeleport()) {
+                                    event.setLockedTeleport(true);
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-lock"), false, sender);
+                                }
+                                else {
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-locked"), false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "unlock": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")) {
@@ -974,9 +795,32 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "tp": {
+                    else {
+                        if (args.length == 1) {
+                            Event event = EventManager.getActiveEvent();
+                            if (event != null) {
+                                if (event.isLockedTeleport()) {
+                                    event.setLockedTeleport(false);
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-unlock"), false, sender);
+                                }
+                                else {
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-unlocked"), false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "tp": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1017,9 +861,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "modify": {
+                    break;
+                }
+                case "modify": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1073,9 +920,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "end": {
+                    break;
+                }
+                case "end": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")) {
@@ -1089,9 +939,20 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "give": {
+                    else {
+                        if (args.length == 1) {
+                            endEvent();
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "give": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1154,13 +1015,16 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "clearinv": {
+                    break;
+                }
+                case "clearinv": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")) {
-                                clearInventory();
+                                clearInventories();
                                 sendLM(getPrefix() + " " + getFilMan().getWords().getString("inventory-cleared"), true, plsender);
                             }
                             else {
@@ -1170,10 +1034,41 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "addeff": {
-                        if (args.length == 3) {
+                    else {
+                        if (args.length == 1) {
+                            clearInventories();
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("inventory-cleared"), false, sender);
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "addeff": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
+                        if (args.length == 2) {
+                            if (plsender.hasPermission("events.staff")
+                                    || plsender.hasPermission("events.moderator")
+                                    || plsender.hasPermission("events.addeff")) {
+                                PotionEffectType effectType = PotionEffectType.getByName(args[1]);
+                                int amplifier = 0;
+                                if (effectType != null) {
+                                    for (Map.Entry<Player, PlayerData> entry : PlayerManager.getJoinedEvent().entrySet()) {
+                                        Player p = entry.getKey();
+                                        Bukkit.getScheduler().runTask(getInstance(), () -> p.addPotionEffect(new PotionEffect(effectType,
+                                                                                                                              Integer.MAX_VALUE,
+                                                                                                                              amplifier)));
+                                    }
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("effect-given"))
+                                                   .replace("%effect%", effectType.getName()),
+                                           true, plsender);
+                                }
+                            }
+                        }
+                        else if (args.length == 3) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
                                     || plsender.hasPermission("events.addeff")) {
@@ -1210,9 +1105,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "cleareff": {
+                    break;
+                }
+                case "cleareff": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1227,9 +1125,21 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "sethealth": {
+                    else {
+                        if (args.length == 1) {
+                            clearEffects();
+                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("effects-cleared"), false, sender);
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "sethealth": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1258,9 +1168,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "create": {
+                    break;
+                }
+                case "create": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.add")) {
@@ -1280,9 +1193,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "remove": {
+                    break;
+                }
+                case "remove": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.add")) {
@@ -1301,9 +1217,27 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "start": {
+                    else {
+                        if (args.length == 2) {
+                            if (EventManager.getEventByName(args[1]) != null) {
+                                EventManager.getEvents().remove(args[1]);
+                                sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-deleted"))
+                                        .replace("%event%", args[1]), false, sender);
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "start": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1331,9 +1265,34 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "backup": {
+                    else {
+                        if (args.length == 2) {
+                            if (EventManager.getActiveEvent() == null) {
+                                EventManager.setActiveEvent(args[1]);
+                                if (EventManager.getActiveEvent() == null) {
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
+                                }
+                                else {
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("event-started"))
+                                                   .replace("%event%", EventManager.getActiveEvent().getName())
+                                            , true
+                                            , sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-already-started"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "backup": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1377,9 +1336,12 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "kick": {
+                    break;
+                }
+                case "kick": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1422,9 +1384,49 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "ban": {
+                    else {
+                        if (args.length == 2) {
+                            Player target = getPlayer(args[1]);
+                            Event event = EventManager.getActiveEvent();
+                            if (event != null) {
+                                if (target != null) {
+                                    if (PlayerManager.getJoinedEvent().containsKey(target)) {
+                                        if (!target.hasPermission("events.staff")
+                                                || target.hasPermission("events.moderator")) {
+                                            PlayerManager.playerLeavingEvent(target, null, false);
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-kicked-admin-side"))
+                                                           .replace("%player%", args[1])
+                                                           .replace("%event%", event.getName())
+                                                    , false
+                                                    , sender);
+                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-kicked-player-side"), false, target);
+                                        }
+                                        else {
+                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-is-admin"), false, sender);
+                                        }
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found-at-event"), false, sender);
+                                    }
+                                }
+                                else {
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found"), false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "ban": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 2) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1474,9 +1476,56 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "unban": {
+                    else {
+                        if (args.length == 2) {
+                            Player target = getPlayer(args[1]);
+                            Event event = EventManager.getActiveEvent();
+                            if (event != null) {
+                                if (target != null) {
+                                    if (PlayerManager.getJoinedEvent().containsKey(target)) {
+                                        if (!target.hasPermission("events.staff")
+                                                || !target.hasPermission("events.moderator")) {
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-admin-side"))
+                                                           .replace("%player%", args[1])
+                                                           .replace("%event%", event.getName())
+                                                    , false
+                                                    , sender
+                                            );
+                                            sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("player-banned-player-side"))
+                                                           .replace("%event%", event.getName())
+                                                    , true
+                                                    , target);
+                                            PlayerManager.playerLeavingEvent(target, null, false);
+                                            //banned
+                                            List<String> banned = EventManager.getActiveEvent().getBanned();
+                                            debugMessage("Banned?: " + banned.add(target.getName()));
+                                        }
+                                        else {
+                                            sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-is-admin"), false, sender);
+                                        }
+                                    }
+                                    else {
+                                        sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found-at-event"), false, sender);
+                                    }
+                                }
+                                else {
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-not-found"), false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("active-event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "unban": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 3) {
                             if (plsender.hasPermission("events.staff")
                                     || plsender.hasPermission("events.moderator")
@@ -1488,7 +1537,8 @@ public final class EventExecutor implements CommandExecutor {
                                         sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-unbanned"), true, plsender);
                                     }
                                     else {
-                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("banned-player-not-found")).replace("%event%", event.getName()), true, plsender);
+                                        sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("banned-player-not-found"))
+                                                .replace("%event%", event.getName()), true, plsender);
                                     }
                                 }
                                 else {
@@ -1502,20 +1552,35 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    case "reload": {
+                    else {
+                        if (args.length == 3) {
+                            Event event = EventManager.getEventByName(args[2]);
+                            String target = args[1];
+                            if (event != null) {
+                                if (event.getBanned().remove(target)) {
+                                    sendLM(getPrefix() + " " + getFilMan().getWords().getString("player-unbanned"), false, sender);
+                                }
+                                else {
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("banned-player-not-found")).replace("%event%", event.getName()), false, sender);
+                                }
+                            }
+                            else {
+                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-not-found"), false, sender);
+                            }
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
+                    }
+                    break;
+                }
+                case "reload": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
                         if (args.length == 1) {
                             if (plsender.hasPermission("events.reload")) {
-                                //config
-                                getInstance().reloadConfig();
-                                //events
-                                getFilMan().saveEvents();
-                                getFilMan().loadEvents();
-                                getFilMan().loadCounter();
-                                //lang
-                                getFilMan().setWords(YamlConfiguration.loadConfiguration(getFilMan().getLangFile()).getConfigurationSection(Objects.requireNonNull(getInstance().getConfig().getString("lang"))));
-                                sendLM(getPrefix() + " " + getFilMan().getWords().getString("config-reloaded"), true, plsender);
+                                reload(plsender);
                             }
                             else {
                                 sendLM(getPrefix() + " " + getFilMan().getWords().getString("no-permission"), true, plsender);
@@ -1524,12 +1589,76 @@ public final class EventExecutor implements CommandExecutor {
                         else {
                             wrongCommand(plsender);
                         }
-                        break;
                     }
-                    default: {
-                        wrongCommand(plsender);
-                        break;
+                    else {
+                        if (args.length == 1) {
+                            reload(sender);
+                        }
+                        else {
+                            wrongCommand(sender);
+                        }
                     }
+                    break;
+                }
+                case "generateitem": {
+                    if (isPlayer) {
+                        Player plsender = (Player) sender;
+                        switch (args.length) {
+                            case 1: {
+                                if (plsender.hasPermission("events.staff")
+                                        || plsender.hasPermission("events.moderator")
+                                        || plsender.hasPermission("events.generateitem")) {
+                                    ItemStack generatedItem = RabItemGenerator.generateItem(ItemRarity.RANDOM, true);
+                                    plsender.getInventory().addItem(generatedItem);
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("item-generated"))
+                                                   .replace("%material%", generatedItem.getType().toString().replace("_", " ").toLowerCase())
+                                                   .replace("%rarity%", ChatColor.stripColor(generatedItem.getItemMeta().getLore().get(0))
+                                                           .replaceAll("&.", "").substring(8)),
+                                           true,
+                                           plsender);
+                                }
+                                break;
+                            }
+                            case 2: {
+                                if (plsender.hasPermission("events.staff")
+                                        || plsender.hasPermission("events.moderator")
+                                        || plsender.hasPermission("events.generateitem")) {
+                                    ItemStack generatedItem = RabItemGenerator.generateItem(ItemRarity.valueOf(args[1].toUpperCase()), false);
+                                    plsender.getInventory().addItem(generatedItem);
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("item-generated"))
+                                                   .replace("%material%", generatedItem.getType().toString().replace("_", " ").toLowerCase())
+                                                   .replace("%rarity%", ChatColor.stripColor(generatedItem.getItemMeta().getLore().get(0))
+                                                           .replaceAll("&.", "").substring(8)),
+                                           true,
+                                           plsender);
+                                }
+                                break;
+                            }
+                            case 3: {
+                                if (plsender.hasPermission("events.staff")
+                                        || plsender.hasPermission("events.moderator")
+                                        || plsender.hasPermission("events.generateitem")) {
+                                    ItemStack generatedItem = RabItemGenerator.generateItem(ItemRarity.valueOf(args[1].toUpperCase()), Boolean.parseBoolean(args[2]));
+                                    plsender.getInventory().addItem(generatedItem);
+                                    sendLM(getPrefix() + " " + Objects.requireNonNull(getFilMan().getWords().getString("item-generated"))
+                                                   .replace("%material%", generatedItem.getType().toString().replace("_", " ").toLowerCase())
+                                                   .replace("%rarity%", ChatColor.stripColor(generatedItem.getItemMeta().getLore().get(0))
+                                                           .replaceAll("&.", "").substring(8)),
+                                           true,
+                                           plsender);
+                                }
+                                break;
+                            }
+                            default:
+                                wrongCommand(sender);
+                                break;
+                        }
+                    }
+                    break;
+                }
+                default: {
+                    wrongCommand(sender);
+                    break;
                 }
             }
         }
@@ -1538,11 +1667,11 @@ public final class EventExecutor implements CommandExecutor {
 
     //<editor-fold desc="Other Methods">
     private void endEvent() {
-        EventManager.setActiveEvent(null);
         getInstance().getServer().getOnlinePlayers().forEach(player -> sendLM(getPrefix() + " " + getFilMan().getWords().getString("event-end"), true, player));
         Map<Player, PlayerData> tempHolder = new HashMap<>(PlayerManager.getJoinedEvent());
         tempHolder.forEach((p, d) -> PlayerManager.playerLeavingEvent(p, null, false));
         PlayerManager.getJoinedEvent().clear();
+        EventManager.setActiveEvent(null);
     }
 
     private void sendFakeBlocks(Player plsender, Location chp) {
@@ -1555,16 +1684,16 @@ public final class EventExecutor implements CommandExecutor {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                plsender.sendBlockChange(checkpoint, Material.AIR.createBlockData());
-                plsender.sendBlockChange(checkpointUP, Material.AIR.createBlockData());
-                debugMessage("Def location: " + checkpoint.toString());
-                debugMessage("Chp Location: " + checkpointUP.toString());
+                plsender.sendBlockChange(checkpoint, checkpoint.getBlock().getBlockData());
+                plsender.sendBlockChange(checkpointUP, checkpointUP.getBlock().getBlockData());
+                debugMessage("Def location: " + checkpoint);
+                debugMessage("Chp Location: " + checkpointUP);
                 timer.cancel();
             }
         }, 10000);
     }
 
-    private void clearInventory() {
+    private void clearInventories() {
         PlayerManager.getJoinedEvent().forEach((p, l) -> {
             p.getInventory().clear();
             p.getInventory().setHelmet(null);
@@ -1593,11 +1722,29 @@ public final class EventExecutor implements CommandExecutor {
                 message.append(" ").append(args[i]);
             }
         }
-        return (prefix != null) ? prefix + message.toString() : getPrefix() + message.toString();
+        return (prefix != null) ? prefix + message : getPrefix() + message;
+    }
+
+    private void reload(CommandSender sender) {
+        boolean isPlayer = sender instanceof Player;
+        //config
+        getInstance().reloadConfig();
+        Main.setPrefix(getInstance().getConfig().getString("prefix", "&4[&cEvents&4]&f"));
+        Main.setPluginPrefix(getInstance().getConfig().getString("plugin-prefix", "[Events]"));
+        Main.setDebugMode(getInstance().getConfig().getBoolean("debug"));
+        //events
+        getFilMan().saveEvents();
+        getFilMan().saveCounter();
+        getFilMan().loadEvents();
+        getFilMan().loadCounter();
+        //lang
+        getFilMan().setWords(YamlConfiguration.loadConfiguration(getFilMan().getLangFile()).getConfigurationSection(Objects.requireNonNull(getInstance().getConfig().getString("lang"))));
+        sendLM(getPrefix() + " " + getFilMan().getWords().getString("config-reloaded"), isPlayer, sender);
     }
 
     private void wrongCommand(CommandSender sender) {
-        sendLM(getPrefix() + " &6Wrong command, type &e" + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", true, sender);
+        boolean isPlayer = sender instanceof Player;
+        sendLM(getPrefix() + " &6Wrong command, type &e" + Objects.requireNonNull(getInstance().getCommand("event")).getUsage() + " for help.", isPlayer, sender);
     }
     //</editor-fold>
 }

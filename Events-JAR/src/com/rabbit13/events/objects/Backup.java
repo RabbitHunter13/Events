@@ -19,8 +19,8 @@ import static com.rabbit13.events.main.Misc.getSpecifiedItem;
 
 
 public class Backup {
-    @Getter private InventoryHolder holder;
-    @Getter private Inventory ender;
+    @Getter private final InventoryHolder holder;
+    @Getter private final Inventory enderInv;
     private Inventory inventory;
     @Getter private int level;
     @Getter private float exp;
@@ -34,9 +34,9 @@ public class Backup {
     public Backup(String name, PlayerData data) {
         holder = () -> inventory;
         inventory = Bukkit.createInventory(holder, 54, name + "'s Inventory");
-        ender = Bukkit.createInventory(holder, 27, name + "'s Ender Chest");
+        enderInv = Bukkit.createInventory(holder, 27, name + "'s Ender Chest");
         inventory.setContents(data.getItems());
-        ender.setContents(data.getEnderChest());
+        enderInv.setContents(data.getEnderChest());
         level = data.getLevel();
         exp = data.getExp();
         initializeItems();
@@ -51,7 +51,7 @@ public class Backup {
     public Backup(String name) {
         holder = () -> inventory;
         inventory = Bukkit.createInventory(holder, 54, name + "'s Inventory");
-        ender = Bukkit.createInventory(holder, 27, name + "'s Ender Chest");
+        enderInv = Bukkit.createInventory(holder, 27, name + "'s Ender Chest");
         File file = new File(BackupManager.getPath(), name + ".yml");
         if (file.exists()) {
             YamlConfiguration ymlBackup = YamlConfiguration.loadConfiguration(file);
@@ -64,7 +64,7 @@ public class Backup {
             List<?> listEnder = ymlBackup.getList("ender");
             if (listEnder != null) {
                 ItemStack[] arrayEnder = listEnder.toArray(new ItemStack[0]);
-                ender.setContents(arrayEnder);
+                enderInv.setContents(arrayEnder);
             }
         }
         else {

@@ -22,33 +22,37 @@ import static com.rabbit13.events.main.Misc.*;
 
 public final class RabEventMods implements InventoryHolder, EventMods, Listener {
     @Getter
-    private String owner;
+    private final String owner;
     @Getter
     private Inventory modsHolder;
     @Getter
-    private Checkpoints checkpoints;
+    private final CheckpointsMod checkpointsMod;
     @Getter
-    private Effects effects;
+    private final EffectsMod effectsMod;
     @Getter
-    private FallDamage fallDamage;
+    private final FallDamageMod fallDamageMod;
     @Getter
-    private LavaEqualFail lavaEqualFail;
+    private final LavaEqualFailMod lavaEqualFailMod;
     @Getter
-    private MoreHP moreHP;
+    private final MoreHPMod moreHPMod;
     @Getter
-    private RewardItems rewards;
+    private final RewardItemsMod rewardItemsMod;
     @Getter
-    private StartingItems startingItems;
+    private final StartingItemsMod startingItemsMod;
+    @Getter
+    private final NoSwimMod noSwimMod;
 
+    // TODO: 3/20/2020 disable collision mod
     public RabEventMods(String owner) {
         this.owner = owner;
-        checkpoints = new RabCheckpointsMod(this);
-        effects = new RabEffectsMod(this);
-        fallDamage = new RabNoFallDamageMod(this);
-        lavaEqualFail = new RabLavaEqualsFailMod(this);
-        moreHP = new RabMoreHPMod(this);
-        rewards = new RabRewardsMod(this);
-        startingItems = new RabStartingItemsMod(this);
+        checkpointsMod = new RabCheckpointsMod(this);
+        effectsMod = new RabEffectsMod(this);
+        fallDamageMod = new RabNoFallDamageMod(this);
+        lavaEqualFailMod = new RabLavaEqualsFailMod(this);
+        moreHPMod = new RabMoreHPMod(this);
+        rewardItemsMod = new RabRewardsMod(this);
+        startingItemsMod = new RabStartingItemsMod(this);
+        noSwimMod = new RabNoSwimMod(this);
         initializeItems();
         Bukkit.getServer().getPluginManager().registerEvents(this, Main.getInstance());
     }
@@ -59,42 +63,42 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
         //<editor-fold desc="Fall Damage">
         var modSection = section.getConfigurationSection("fall-damage");
         if (modSection != null) {
-            fallDamage = new RabNoFallDamageMod(this, modSection.getBoolean("enabled", false));
+            fallDamageMod = new RabNoFallDamageMod(this, modSection.getBoolean("enabled", false));
         }
         else {
-            fallDamage = new RabNoFallDamageMod(this);
+            fallDamageMod = new RabNoFallDamageMod(this);
             error("Error occured while loading fall-damage section in event: " + owner);
         }
         //</editor-fold>
         //<editor-fold desc="Lava equals fail">
         modSection = section.getConfigurationSection("lava-equals-fail");
         if (modSection != null) {
-            lavaEqualFail = new RabLavaEqualsFailMod(this, modSection.getBoolean("enabled", true));
+            lavaEqualFailMod = new RabLavaEqualsFailMod(this, modSection.getBoolean("enabled", true));
         }
         else {
-            lavaEqualFail = new RabLavaEqualsFailMod(this);
+            lavaEqualFailMod = new RabLavaEqualsFailMod(this);
             error("Error occured while loading lava-equals-fail section in event: " + owner);
         }
         //</editor-fold>
         //<editor-fold desc="Checkpoints">
         modSection = section.getConfigurationSection("checkpoints");
         if (modSection != null) {
-            checkpoints = new RabCheckpointsMod(this, modSection.getBoolean("enabled", true));
+            checkpointsMod = new RabCheckpointsMod(this, modSection.getBoolean("enabled", true));
         }
         else {
-            checkpoints = new RabCheckpointsMod(this);
+            checkpointsMod = new RabCheckpointsMod(this);
             error("Error occured while loading checkpoints section in event: " + owner);
         }
         //</editor-fold>
         //<editor-fold desc="MoreHP">
         modSection = section.getConfigurationSection("more-hp");
         if (modSection != null) {
-            moreHP = new RabMoreHPMod(this,
-                                      modSection.getInt("value", 20),
-                                      modSection.getBoolean("enabled", false));
+            moreHPMod = new RabMoreHPMod(this,
+                                         modSection.getInt("value", 20),
+                                         modSection.getBoolean("enabled", false));
         }
         else {
-            moreHP = new RabMoreHPMod(this);
+            moreHPMod = new RabMoreHPMod(this);
             error("Error occured while loading more-hp section in event: " + owner);
         }
         //</editor-fold>
@@ -107,17 +111,17 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
                 startingItemsArr = startingList.toArray(new ItemStack[0]);
             }
             if (startingItemsArr != null) {
-                startingItems = new RabStartingItemsMod(this,
-                                                        startingItemsArr,
-                                                        modSection.getBoolean("enabled"));
+                startingItemsMod = new RabStartingItemsMod(this,
+                                                           startingItemsArr,
+                                                           modSection.getBoolean("enabled"));
             }
             else {
-                startingItems = new RabStartingItemsMod(this);
+                startingItemsMod = new RabStartingItemsMod(this);
                 error("Error occured while loading starting-items items in event: " + owner);
             }
         }
         else {
-            startingItems = new RabStartingItemsMod(this);
+            startingItemsMod = new RabStartingItemsMod(this);
             error("Error occured while loading starting-items section in event: " + owner);
         }
         //</editor-fold>
@@ -131,17 +135,17 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
                 effectSettingsArr = potionList.toArray(new ItemStack[0]);
             }
             if (effectSettingsArr != null) {
-                effects = new RabEffectsMod(this,
-                                            effectSettingsArr,
-                                            modSection.getBoolean("enabled", true));
+                effectsMod = new RabEffectsMod(this,
+                                               effectSettingsArr,
+                                               modSection.getBoolean("enabled", true));
             }
             else {
-                effects = new RabEffectsMod(this);
+                effectsMod = new RabEffectsMod(this);
                 error("Error occured while loading effects items in event: " + owner);
             }
         }
         else {
-            effects = new RabEffectsMod(this);
+            effectsMod = new RabEffectsMod(this);
             error("Error occured while loading effects section in event: " + owner);
         }
         //</editor-fold>
@@ -154,19 +158,29 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
                 rewardItemsArr = rewardList.toArray(new ItemStack[0]);
             }
             if (rewardItemsArr != null) {
-                rewards = new RabRewardsMod(this,
-                                            modSection.getInt("max-winners", 3),
-                                            rewardItemsArr,
-                                            modSection.getBoolean("enabled"));
+                rewardItemsMod = new RabRewardsMod(this,
+                                                   modSection.getInt("max-winners", 3),
+                                                   rewardItemsArr,
+                                                   modSection.getBoolean("enabled"));
             }
             else {
-                rewards = new RabRewardsMod(this);
+                rewardItemsMod = new RabRewardsMod(this);
                 error("Error occured while loading reward-items items in event: " + owner);
             }
         }
         else {
-            rewards = new RabRewardsMod(this);
+            rewardItemsMod = new RabRewardsMod(this);
             error("Error occured while loading reward-items section in event: " + owner);
+        }
+        //</editor-fold>
+        //<editor-fold desc="No-Swim">
+        modSection = section.getConfigurationSection("no-swim");
+        if (modSection != null) {
+            noSwimMod = new RabNoSwimMod(this, modSection.getBoolean("enabled", false));
+        }
+        else {
+            noSwimMod = new RabNoSwimMod(this);
+            error("Error occured while loading lava-equals-fail section in event: " + owner);
         }
         //</editor-fold>
         initializeItems();
@@ -183,6 +197,8 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
                                                "If activated, checkpoints will work"));
         modsHolder.setItem(3, getSpecifiedItem(Material.GOLDEN_APPLE, 1, "&6More HP Mod",
                                                "Set player hp to given value. &6Minimum is 1"));
+        modsHolder.setItem(4, getSpecifiedItem(Material.WATER_BUCKET, 1, "&3No Swim Mod",
+                                               "If enabled, players cannot 1.13 swim on event"));
         modsHolder.setItem(8, getSpecifiedItem(Material.CHEST_MINECART, 1, "&bStarting Items",
                                                "If enabled, player will get starting items",
                                                "that are in this event's \"Starting items\" inventory."));
@@ -203,31 +219,35 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
     public void openMods(int slot, Player player) {
         switch (slot) {
             case 0: {
-                player.openInventory(fallDamage.getInventory());
+                player.openInventory(fallDamageMod.getInventory());
                 break;
             }
             case 1: {
-                player.openInventory(lavaEqualFail.getInventory());
+                player.openInventory(lavaEqualFailMod.getInventory());
                 break;
             }
             case 2: {
-                player.openInventory(checkpoints.getInventory());
+                player.openInventory(checkpointsMod.getInventory());
                 break;
             }
             case 3: {
-                player.openInventory(moreHP.getInventory());
+                player.openInventory(moreHPMod.getInventory());
+                break;
+            }
+            case 4: {
+                player.openInventory(noSwimMod.getInventory());
                 break;
             }
             case 8: {
-                player.openInventory(startingItems.getInventory());
+                player.openInventory(startingItemsMod.getInventory());
                 break;
             }
             case 16: {
-                player.openInventory(rewards.getInventory());
+                player.openInventory(rewardItemsMod.getInventory());
                 break;
             }
             case 17: {
-                player.openInventory(effects.getInventory());
+                player.openInventory(effectsMod.getInventory());
                 break;
             }
         }
@@ -239,6 +259,9 @@ public final class RabEventMods implements InventoryHolder, EventMods, Listener 
             if (e.getClickedInventory() == this.getInventory()) {
                 this.openMods(e.getSlot(), (Player) e.getWhoClicked());
                 debugMessage("Clicked slot: " + e.getSlot());
+                e.setCancelled(true);
+            }
+            else {
                 e.setCancelled(true);
             }
         }

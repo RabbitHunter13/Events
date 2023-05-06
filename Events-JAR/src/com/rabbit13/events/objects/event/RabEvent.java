@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -139,6 +140,10 @@ public class RabEvent implements InventoryHolder, Event, Listener {
     public void updateItems(int slot, String data, Player player) {
         if (slot == 0) {
             name = data;
+            modification.getViewers().forEach(HumanEntity::closeInventory);
+            Inventory newI = Bukkit.createInventory(this, 9, "Event Settings: " + name);
+            newI.setContents(modification.getContents());
+            modification = newI;
             modification.setItem(slot, getSpecifiedItem(Material.GRASS_BLOCK, 1, name));
             sendLM(Main.getPrefix() + " " + Objects.requireNonNull(Main.getFilMan().getWords().getString("event-modification-finished"))
                            .replace("%key%", "name")
@@ -225,6 +230,9 @@ public class RabEvent implements InventoryHolder, Event, Listener {
                 debugMessage("Clicked type: " + e.getAction().toString());
                 e.setCancelled(true);
             }
+            else {
+                e.setCancelled(true);
+            }
         }
     }
 
@@ -233,5 +241,9 @@ public class RabEvent implements InventoryHolder, Event, Listener {
     @Override
     public Inventory getInventory() {
         return modification;
+    }
+
+    public static class RabType implements Type {
+        @Getter private String type;
     }
 }

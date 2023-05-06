@@ -14,7 +14,6 @@ import java.util.List;
 
 import static com.rabbit13.events.main.Main.getFilMan;
 import static com.rabbit13.events.main.Main.getPrefix;
-import static com.rabbit13.events.main.Misc.debugMessage;
 import static com.rabbit13.events.main.Misc.sendLM;
 
 public class BackupListener implements Listener {
@@ -23,7 +22,6 @@ public class BackupListener implements Listener {
         for (val entry : BackupManager.getBackups().entrySet()) {
             val entryValue = entry.getValue();
             if (entryValue != null) {
-                debugMessage("Backup#" + entry.getKey() + " Inventory equals: " + (e.getClickedInventory() == entryValue.getHolder().getInventory()));
                 if (e.getClickedInventory() == entryValue.getHolder().getInventory()) {
                     if (e.getSlot() == 52) {
                         e.setCancelled(true);
@@ -53,7 +51,7 @@ public class BackupListener implements Listener {
                                 }
                             }
                             List<ItemStack> ender = new ArrayList<>();
-                            for (val content : entryValue.getEnder().getContents()) {
+                            for (val content : entryValue.getEnderInv().getContents()) {
                                 if (content != null) {
                                     ender.add(content);
                                 }
@@ -74,7 +72,7 @@ public class BackupListener implements Listener {
                     }
                     else if (e.getSlot() == 53) {
                         e.setCancelled(true);
-                        e.getWhoClicked().openInventory(entryValue.getEnder());
+                        e.getWhoClicked().openInventory(entryValue.getEnderInv());
                     }
                     break;
                 }

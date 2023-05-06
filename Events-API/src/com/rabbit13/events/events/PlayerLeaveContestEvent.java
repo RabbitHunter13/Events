@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public abstract class PlayerLeaveContestEvent extends org.bukkit.event.Event {
     private static final HandlerList handlers = new HandlerList();
-    private String playerName;
-    private Event event;
+    private final String playerName;
+    private final Event event;
     private boolean canceled;
 
     public PlayerLeaveContestEvent(String playerName, Event event) {

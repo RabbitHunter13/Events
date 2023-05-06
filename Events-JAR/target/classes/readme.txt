@@ -1,9 +1,9 @@
 #----------------------------Permissions to use----------------------------#
 events.staff - all commands, reload excluded
-events.moderator - all commands used for moderating events (kicking, baning
+events.moderator - all commands used for moderating events (kicking, banning)
 events.<command> - allows using of defined command (some of them are connected, like events.join allows usage of /e and /e leave)
 
-#---------------------------------Commands---------------------------------#  
+#---------------------------------Commands---------------------------------#
 (player)
   - /e - joins active event, or teleports at event/checkpoint
   - /e quit - leaves active event

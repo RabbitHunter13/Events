@@ -50,4 +50,6 @@ public interface Event extends InventoryHolder {
 
     List<String> getBanned();
 
+    interface Type {
+    }
 }

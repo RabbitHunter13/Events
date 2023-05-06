@@ -18,7 +18,7 @@ public abstract class RabMod implements Mod, Listener {
     @Getter
     private final EventMods mods;
     private boolean enabled;
-    private Inventory gui;
+    private final Inventory gui;
 
     public RabMod(EventMods mods) {
         this.mods = mods;
