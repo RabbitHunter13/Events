@@ -11,6 +11,8 @@ public class RabPlayerData implements PlayerData {
     @Getter
     private final ItemStack[] items;
     @Getter
+    private final ItemStack[] enderChest;
+    @Getter
     private final Collection<PotionEffect> effects;
     @Getter
     private final double maxHP;
@@ -22,12 +24,14 @@ public class RabPlayerData implements PlayerData {
     private final Location location;
 
     public RabPlayerData(ItemStack[] items,
+                         ItemStack[] enderChest,
                          Collection<PotionEffect> effects,
                          double maxHP,
                          float exp,
                          int level,
                          Location location) {
         this.items = items;
+        this.enderChest = enderChest;
         this.effects = effects;
         this.maxHP = maxHP;
         this.exp = exp;

@@ -1,9 +1,8 @@
 cze:
-  #note - variables are defined just as comments say (so in "no variable" block you cant use %event% etc.)
-
   ##########Administration messages##########
   event-created: "&eVytvoril jsi event %event%."
   event-deleted: "&eSmazal jsi event %event%"
+  event-already-exists: "&cTento event jiz existuje"
   event-started: "&eEvent &f%event% &ebyl aktivovan!"
   event-already-started: "&cEvent jiz bezi."
   event-lock: "&eEvent zavren"
@@ -17,22 +16,23 @@ cze:
   event-modification-finished: "&aUpravil jsi key %key% na hodnotu &f%value%"
   event-list-official: "&eSeznam official eventu:"
   event-list-other: "&eSeznam ostatnich eventu:"
+  event-list-owner: "&eSeznam eventu hrace &6%owner%&e:"
 
   checkpoint-reached: "&aCheckpoint reached!"
   checkpoint-added: "&aPridal jsi checkpoint &5%location%"
   checkpoint-removed: "&6Smazal jsi checkpoint &5%location%"
   checkpoint-removed-all: "&6Smazal jsi vsechny checkpointy"
   checkpoint-not-found: "&cNa tvem miste nebyl nalezen zadny checkpoint"
-  checkpoint-show: "&ePrave vidis vsechny checkpointy (sklo)"
+  checkpoint-show: "&ePrave vidis vsechny checkpointy (zelena vlna)"
   checkpoint-list: "&eSeznam checkpointu v eventu &6%event%:"
   checkpoints-not-active: "&6Na tomto eventu nejsou aktivni checkpointy"
 
-  banned-player-not-found: "&cTento hrac nebyl na eventu %event% zabanovan"
   player-banned-admin-side: "&6Hrac %player% byl trvale vyloucen z eventu %event%."
   player-kicked-admin-side: "&6Hrac %player% byl vyhozen z eventu."
   player-not-found: "&6Tento hrac neni online, nebo neexistuje."
   player-not-found-at-event: "&6Tento hrac neni na eventu."
   player-is-admin: "&cAdminy nemuzes vyhodit ani zabanovat z eventu."
+  banned-player-not-found: "&cTento hrac nebyl na eventu %event% zabanovan"
 
   win-counter-add: "&eByla prictena vyhra hraci &f%player%"
   win-counter-show: "&ePocet vytezstvi na eventech: %wins%"
@@ -40,7 +40,20 @@ cze:
 
   world-not-found: "Svet s nazvem %world% nebyl nalezen."
 
-  backup-not-found: "&6Tento backup nebyl nalezen"
+  items-given: "&e%material% &5(&d%amount%&5) &a byl uspesne rozdan mezi hracema na eventu"
+  item-generated: "&eItem &f%material% &ebyl vygeneraovan se vzacnosti &f&l%rarity%"
+  wrong-material: "&cTento typ itemu nebyl nalezen."
+
+  effect-given: "&eEffekt %effect% byl byl dan vsem hracum na eventu."
+  effect-cleared: "&6Vsechny efekty vseh hracu na eventy byly smazany."
+  wrong-effect: "&c%effect% je neplatný effekt."
+
+  backup-not-found: "&6Backup %name% nebyl nalezen"
+  backups-reloaded: "&eBackups were reloaded."
+  backup-returned: "&eBackup was given back to player"
+  backup-full-inventory: "&cThis player has full inventory, cannot return items automatically"
+
+  health-changed: "&eMaximalni zivoty byby zmeneny na hodnotu &6%health%&e."
   inventory-cleared: "&eInventare vseh hracu na eventu byli smazany"
   not-same-world-as-event: "&cMusis byt ve stejnym svete jako event pokud chces upravovat checkpointy"
   config-reloaded: "&eYaml konfigurace byla obnovena"
@@ -61,3 +74,77 @@ cze:
   event-leave: "&eOpustil jsi event."
   event-fail: "&eBohuzel jsi selhal. Preji vice stesti priste :)"
   event-end: "&eEvent skoncil."
+eng:
+  ##########Administration messages##########
+  event-created: "&eCreated event %event%."
+  event-deleted: "&eDeleted event %event%"
+  event-started: "&eEvent &f%event% &ehas been enabled!"
+  event-already-started: "&cSome event is active."
+  event-lock: "&eEvent locked"
+  event-unlock: "&eEvent opened"
+  event-already-locked: "&6Event already locked."
+  event-already-unlocked: "&6Event already opened."
+  event-not-owner: "&cThis event is not yours, so you cant edit is.."
+  event-not-found: "&cThis event was not found."
+  event-modification-init: "&eWrite new value %value% to chat:"
+  event-modification-number-error: "&cThis is not number! Please write a number."
+  event-modification-finished: "&aKey %key% edited to value &f%value%"
+  event-list-official: "&eList of official events:"
+  event-list-other: "&eList of other events:"
+  event-list-owner: "&eList of player &6%owner% &e:"
+
+  checkpoint-reached: "&aCheckpoint reached!"
+  checkpoint-added: "&aCheckpoint added! &5%location%"
+  checkpoint-removed: "&6Checkpoint deleted! &5%location%"
+  checkpoint-removed-all: "&6deleted all checkpoints in this event."
+  checkpoint-not-found: "&cThere is not any checkpoint at your position"
+  checkpoint-show: "&eNow you see all checkpoints (green wool)"
+  checkpoint-list: "&eList of all checkpoints at event &6%event%:"
+
+  banned-player-not-found: "&cThis player was not banned at event %event%"
+  player-banned-admin-side: "&6Player %player% was banned at event %event%."
+  player-kicked-admin-side: "&6Player %player% was kicked from event ."
+  player-not-found: "&6Player not found."
+  player-not-found-at-event: "&6This player in not at event."
+  player-is-admin: "&cAdmins cannot be banned or kicked from event."
+
+  win-counter-add: "&eWin cound raised for player &f%player%"
+  win-counter-show: "&eYour win count: %wins%"
+  win-counter-list: "&eTop 10 winners:"
+
+  world-not-found: "World %world% was not found."
+
+  items-given: "&e%material% &5(&d%amount%&5) &a was given to players successfully."
+  item-generated: '&eItem &f%material% &ewas generated with rarity &f&l%rarity%'
+  wrong-material: "&cThis material was not found."
+
+  effect-given: "&eEffekt %effect% byl byl dan vsem hracum na eventu."
+  effect-cleared: "&6Vsechny efekty vseh hracu na eventy byly smazany."
+  wrong-effect: "&c%effect% je neplatný effekt."
+
+  backup-not-found: "&6Backup was not found"
+  backups-reloaded: "&eBackups were reloaded."
+  backup-returned: "&eBackup was given back to player"
+  backup-full-inventory: "&cThis player has full inventory, cannot return items automatically"
+
+  health-changed: "&eMaximalni zivoty byby zmeneny na hodnotu &6%health%&e."
+  inventory-cleared: "&eAll players at event inventories were cleared."
+  not-same-world-as-event: "&cYou have to be in the same world as event if you want to show checkpoints."
+  config-reloaded: "&eYamls reloaded"
+
+  ##########Player Notification messages#########
+  no-permission: "&cYou do not have permission!"
+  no-permission-commands: "&cYou cant use commands et the event! use &6/e quit &cto quit the event."
+
+  player-banned-player-side: "&cYou have been banned from event &4%event%."
+  player-kicked-player-side: "&6You have been kicked from event."
+  player-not-at-event: "&cYou cant use this command if you are not at the event."
+
+  teleport-success: "&6You have been teleported to event &e%event%."
+  teleport-banned: "&cYou cannot join this, because you have been banned from this event."
+
+  active-event-not-found: "&6No event is active."
+  event-locked: "&cEvent locked."
+  event-leave: "&eLeaving event."
+  event-fail: "&eYou failed. &aBetter luck next time :)"
+  event-end: "&eEvent Ended."

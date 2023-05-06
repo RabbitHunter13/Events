@@ -1,12 +1,11 @@
 package com.rabbit13.events.objects.event;
 
-import com.rabbit13.events.objects.event.mods.EventMods;
-import com.rabbit13.events.objects.event.tools.EventLocation;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -37,7 +36,7 @@ public interface Event extends InventoryHolder {
 
     String getOwner();
 
-    EventLocation getTeleport();
+    Location getTeleport();
 
     boolean isLockedTeleport();
 
@@ -47,6 +46,10 @@ public interface Event extends InventoryHolder {
 
     List<Location> getCheckpoints();
 
+    @Nullable Location getFinish();
+
     List<String> getBanned();
 
+    interface Type {
+    }
 }

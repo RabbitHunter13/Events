@@ -1,10 +1,14 @@
 package com.rabbit13.events.objects.event.tools;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
 
-public class RabCheckpointLocation implements CheckpointLocation {
-    Location checkpointLocation;
-    Location savedLocation;
+public final class RabCheckpointLocation implements CheckpointLocation {
+    @Getter @Setter
+    private Location checkpointLocation;
+    @Getter @Setter
+    private Location savedLocation;
 
     public RabCheckpointLocation(Location checkpointLocation, Location savedLocation) {
         this.checkpointLocation = checkpointLocation;
@@ -19,19 +23,4 @@ public class RabCheckpointLocation implements CheckpointLocation {
                 + this.getCheckpointLocation().getBlockZ() + "]";
     }
 
-    public Location getCheckpointLocation() {
-        return checkpointLocation;
-    }
-
-    public void setCheckpointLocation(Location checkpointLocation) {
-        this.checkpointLocation = checkpointLocation;
-    }
-
-    public Location getSavedLocation() {
-        return savedLocation;
-    }
-
-    public void setSavedLocation(Location savedLocation) {
-        this.savedLocation = savedLocation;
-    }
 }

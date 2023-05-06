@@ -19,7 +19,6 @@ import java.util.*;
 import java.util.logging.Level;
 
 import static com.rabbit13.events.main.Main.getInstance;
-import static com.rabbit13.events.main.Main.isDebugMode;
 
 
 public final class Misc {
@@ -39,8 +38,12 @@ public final class Misc {
      */
     public static void sendLM(String s, boolean colors, CommandSender... cs) {
         for (CommandSender c : cs) {
-            c.sendMessage(colors ? ChatColor.translateAlternateColorCodes('&', s) : ChatColor.stripColor(s));
+            c.sendMessage(colors ? ChatColor.translateAlternateColorCodes('&', s) : ChatColor.stripColor(s).replaceAll("&.", ""));
         }
+    }
+
+    public static String textIntoColor(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
     }
 
     /**
@@ -69,10 +72,26 @@ public final class Misc {
     }
 
     /**
+     * removes null values from itemstack arrays generated thru yaml serialize
+     * ignoring last position (back item)
+     *
+     * @return that same array of items, but without null values
+     */
+    public static ItemStack[] removeNullValues(ItemStack[] items) {
+        List<ItemStack> result = new ArrayList<>();
+        for (int i = 0; i < items.length - 1; i++) {
+            ItemStack item = items[i];
+            if (item != null)
+                result.add(item);
+        }
+        return result.toArray(new ItemStack[0]);
+    }
+
+    /**
      * @param txt - text to be reported via console
      */
     public static void debugMessage(String txt) {
-        if (isDebugMode())
+        if (Main.isDebugMode())
             getInstance().getLogger().log(Level.INFO, txt);
     }
 

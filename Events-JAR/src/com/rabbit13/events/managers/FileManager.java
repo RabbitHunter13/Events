@@ -1,20 +1,21 @@
 package com.rabbit13.events.managers;
 
+import com.rabbit13.events.main.Misc;
 import com.rabbit13.events.objects.event.Event;
 import com.rabbit13.events.objects.event.RabEvent;
-import com.rabbit13.events.objects.event.tools.RabEventLocation;
-import org.bukkit.Bukkit;
+import com.rabbit13.events.objects.event.mods.EffectsMod;
+import com.rabbit13.events.objects.event.mods.MoreHPMod;
+import com.rabbit13.events.objects.event.mods.RewardItemsMod;
+import com.rabbit13.events.objects.event.mods.StartingItemsMod;
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,12 +25,12 @@ import static com.rabbit13.events.main.Misc.*;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public final class FileManager {
-    private final File langFile;
+    @Getter private final File langFile;
 
     private final File eventsFile;
     private final File counterFile;
 
-    private ConfigurationSection words;
+    @Getter @Setter private ConfigurationSection words;
     private final String languagePreset;
 
     public FileManager() {
@@ -43,7 +44,6 @@ public final class FileManager {
         //other
         languagePreset = getInstance().getConfig().getString("lang");
         assert languagePreset != null;
-        words = YamlConfiguration.loadConfiguration(langFile).getConfigurationSection(languagePreset);
         //save files to dataFolder (first time)
         final File readme = new File(path, "readme.txt");
         final File[] files = new File[]{langFile, readme};
@@ -62,7 +62,6 @@ public final class FileManager {
                 }
             }
         }
-
         //different dir
         final File[] files2 = new File[]{eventsFile, counterFile};
         for (File f : files2) {
@@ -77,6 +76,7 @@ public final class FileManager {
                 }
             }
         }
+        words = YamlConfiguration.loadConfiguration(langFile).getConfigurationSection(languagePreset);
     }
 
     @SuppressWarnings("SuspiciousToArrayCall")
@@ -89,16 +89,6 @@ public final class FileManager {
         for (String key : yml.getKeys(false)) {
             ConfigurationSection keyconf = yml.getConfigurationSection(key);
             if (keyconf != null) {
-                //<editor-fold desc="Teleport">
-                String[] coords = new String[0];
-                String teleport = keyconf.getString("teleport");
-                if (teleport != null) {
-                    coords = teleport.split(",");
-                }
-                else {
-                    error("The information about \"teleport\" in " + keyconf.getName() + "is missing!");
-                }
-                //</editor-fold>
                 //<editor-fold desc="Checkpoints">
                 Location[] checkpoints = null;
                 List<?> checklist = keyconf.getList("checkpoints");
@@ -111,79 +101,82 @@ public final class FileManager {
                 //</editor-fold>
 
                 //<editor-fold desc="Loading Event into Map">
-                if (coords.length == 6) {
-                    try {
-                        World world = Bukkit.getWorld(coords[0]);
-                        if (world == null) {
-                            throw new InvalidConfigurationException();
-                        }
-                        EventManager.getEvents().put(key, new RabEvent(
-                                key,
-                                keyconf.getString("owner"),
-                                new RabEventLocation(world,
-                                                     Double.parseDouble(coords[1]),
-                                                     Double.parseDouble(coords[2]),
-                                                     Double.parseDouble(coords[3]),
-                                                     Float.parseFloat(coords[4]),
-                                                     Float.parseFloat(coords[5])),
-                                checkpoints,
-                                banned,
-                                keyconf.getConfigurationSection("mods")
-                        ));
-                    } catch (NumberFormatException | InvalidConfigurationException e) {
-                        error(" Error Loading location in" + key + " Location have to be \"world_name, x , y, z, yaw, pitch\".");
-                    }
+                try {
+                    //noinspection ConstantConditions
+                    EventManager.getEvents().put(key, new RabEvent(
+                            key,
+                            keyconf.getString("owner"),
+                            keyconf.getLocation("teleport"),
+                            keyconf.getLocation("finish"),
+                            checkpoints,
+                            banned,
+                            keyconf.getConfigurationSection("mods")
+                    ));
+                } catch (Exception e) {
+                    error(" The Event " + key + " couldn't be loaded");
+                    error("error had this stacktrace: ");
+                    e.printStackTrace();
                 }
-                else {
-                    error(" Error Loading location in" + key + " Location must have 6 positions. (world_name, x, y, z, yaw, pitch)");
-                }
-                //</editor-fold>
             }
-            else {
-                error(" The Event" + key + " couldn't be loaded");
-            }
+            //</editor-fold>
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
+
     public void saveEvents() {
         YamlConfiguration yml = new YamlConfiguration();
         for (Map.Entry<String, Event> entry : EventManager.getEvents().entrySet()) {
             Event event = entry.getValue();
             ConfigurationSection eventSection = yml.createSection(event.getName());
-
-            //<editor-fold desc="Save Start items">
-            List<ItemStack> startList = new ArrayList<>();
-            for (ItemStack item : event.getMods().getStartingItems().getInventory().getContents()) {
-                if (item != null)
-                    startList.add(item);
-            }
-            //</editor-fold>
-            //<editor-fold desc="Save Effects">
-            List<ItemStack> potionList = new ArrayList<>();
-            for (ItemStack item : event.getMods().getEffectSettings().getInventory().getContents()) {
-                if (item != null) {
-                    potionList.add(item);
-                }
-            }
-            //</editor-fold>
             //<editor-fold desc="Save Event">
             eventSection.set("owner", event.getOwner());
-            eventSection.set("teleport", event.getTeleport().toString());
+            eventSection.set("teleport", event.getTeleport());
+            eventSection.set("finish", event.getFinish());
             eventSection.set("checkpoints", event.getCheckpoints());
             eventSection.set("banned", event.getBanned());
             //</editor-fold>
             //<editor-fold desc="Save Mods">
             ConfigurationSection mods = eventSection.createSection("mods");
-            mods.set("fall-damage", event.getMods().isFallDamageEnabled());
-            mods.set("lava-equals-fail", event.getMods().isLavaEqualsFailEnabled());
-            mods.set("active-checkpoints", event.getMods().isActiveCheckpointsEnabled());
-            mods.set("more-hp", event.getMods().isMoreHPEnabled());
-            mods.set("more-hp-value", event.getMods().getMoreHP());
-            mods.set("starting-items", event.getMods().isStartingItemsEnabled());
-            mods.set("starting-items-value", startList);
-            mods.set("effect-settings", event.getMods().isEffectSettingsEnabled());
-            mods.set("effect-settings-value", potionList);
+            //<editor-fold desc="Fall Damage">
+            ConfigurationSection mod = mods.createSection("fall-damage");
+            mod.set("enabled", event.getMods().getFallDamageMod().isEnabled());
+            //</editor-fold>
+            //<editor-fold desc="Lava equals fail">
+            mod = mods.createSection("lava-equals-fail");
+            mod.set("enabled", event.getMods().getLavaEqualFailMod().isEnabled());
+            //</editor-fold>
+            //<editor-fold desc="Checkpoints">
+            mod = mods.createSection("checkpoints");
+            mod.set("enabled", event.getMods().getCheckpointsMod().isEnabled());
+            //</editor-fold>
+            //<editor-fold desc="MoreHP">
+            mod = mods.createSection("more-hp");
+            MoreHPMod moreHPMod = event.getMods().getMoreHPMod();
+            mod.set("enabled", moreHPMod.isEnabled());
+            mod.set("value", moreHPMod.getHealth());
+            //</editor-fold>
+            //<editor-fold desc="Starting Items">
+            mod = mods.createSection("starting-items");
+            StartingItemsMod startingItemsMod = event.getMods().getStartingItemsMod();
+            mod.set("enabled", startingItemsMod.isEnabled());
+            mod.set("items", removeNullValues(startingItemsMod.getStartingItems().getContents()));
+            //</editor-fold>
+            //<editor-fold desc="Effects">
+            mod = mods.createSection("effects");
+            EffectsMod effectsMod = event.getMods().getEffectsMod();
+            mod.set("enabled", effectsMod.isEnabled());
+            mod.set("items", removeNullValues(effectsMod.getEffectsInv().getContents()));
+            //</editor-fold>
+            //<editor-fold desc="Rewards">
+            mod = mods.createSection("rewards");
+            RewardItemsMod rewardItems = event.getMods().getRewardItemsMod();
+            mod.set("enabled", rewardItems.isEnabled());
+            mod.set("items", rewardItems.getRewards().getContents());
+            //</editor-fold>
+            //<editor-fold desc="No Swim">
+            mod = mods.createSection("no-swim");
+            mod.set("enabled", event.getMods().getNoSwimMod().isEnabled());
+            //</editor-fold>
             //</editor-fold>
         }
         try {
@@ -213,45 +206,41 @@ public final class FileManager {
         }
     }
 
-    public File getLangFile() {
-        return langFile;
-    }
-
-    public ConfigurationSection getWords() {
-        return words;
-    }
-
-    public void setWords(ConfigurationSection words) {
-        this.words = words;
-    }
-
     /**
      * Updates lang.yml file if needed
      */
-    public boolean checkWords() {
+    public void checkWords() {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(langFile);
-        ConfigurationSection oldWords = yml.getConfigurationSection(languagePreset);
+        ConfigurationSection externalWords = yml.getConfigurationSection(languagePreset);
 
         InputStreamReader reader = new InputStreamReader(Objects.requireNonNull(getInstance().getResource("lang.yml")));
-        ConfigurationSection newWords = YamlConfiguration.loadConfiguration(reader).getConfigurationSection(languagePreset);
-        assert newWords != null;
-        assert oldWords != null;
+        ConfigurationSection internalWords = YamlConfiguration.loadConfiguration(reader).getConfigurationSection(languagePreset);
+        assert internalWords != null;
+
         boolean changed = false;
-        for (String key : newWords.getKeys(false)) {
-            if (!oldWords.contains(key)) {
-                oldWords.set(key, newWords.getString(key));
-                changed = true;
+        if (externalWords != null) {
+            for (String key : internalWords.getKeys(false)) {
+                if (!externalWords.contains(key)) {
+                    externalWords.set(key, internalWords.getString(key));
+                    changed = true;
+                }
             }
         }
-        if (changed) {
-            words = oldWords;
+        else {
+            externalWords = yml.createSection(languagePreset);
+            for (String key : internalWords.getKeys(false)) {
+                externalWords.set(key, internalWords.getString(key));
+                changed = true;
+            }
         }
         try {
             yml.save(langFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return changed;
+        if (changed) {
+            words = internalWords;
+            Misc.error("Found missing keywords in lang.yml! Saving new ones into file and temporarily using internal ones");
+        }
     }
 }

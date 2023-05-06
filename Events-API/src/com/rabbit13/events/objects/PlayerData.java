@@ -23,6 +23,8 @@ public interface PlayerData {
 
     ItemStack[] getItems();
 
+    ItemStack[] getEnderChest();
+
     Collection<PotionEffect> getEffects();
 
     double getMaxHP();
